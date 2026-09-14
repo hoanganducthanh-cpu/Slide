@@ -1,4 +1,7 @@
 import streamlit as st
+from PIL import Image
+import os
+import base64
 
 st.set_page_config(
     page_title="Đào tạo PCCC - Nhà máy Điện gió Yang Trung",
@@ -7,47 +10,157 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# ===================== ĐƯỜNG DẪN ẢNH =====================
+LOGO_PATH = "hình ảnh/Horizontal_logo_pese_1.png"
+BG_PATH = "hình ảnh/trang_trai_gio.jpg"
+
+
+@st.cache_data
+def img_to_base64(path):
+    """Đọc ảnh → base64 để nhúng vào HTML"""
+    try:
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    except FileNotFoundError:
+        return ""
+
+
+@st.cache_data
+def load_image(path):
+    if os.path.exists(path):
+        return Image.open(path)
+    return None
+
+
 # ===================== CSS =====================
 st.markdown("""
 <style>
     .main { background: #ffffff; }
-    .block-container { padding: 1rem 2rem 3rem 2rem; max-width: 1200px; }
+    .block-container { padding: 1rem 2rem 3rem 2rem; max-width: 1300px; }
 
+    /* ================= HEADER ================= */
     .header-bar {
         background: linear-gradient(135deg, #cc0000, #990000);
         color: #fff;
-        padding: 10px 20px;
+        padding: 8px 22px;
         border-radius: 6px;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
     }
-    .header-bar .company {
-        font-size: 11px;
-        color: rgba(255,255,255,.9);
+    .header-bar .hdr-logo {
+        height: 30px;
+        flex-shrink: 0;
+    }
+    .header-bar .hdr-info {
+        flex: 1;
         line-height: 1.3;
     }
-    .header-bar .slide-no {
-        float: right;
-        font-size: 11px;
-        color: rgba(255,255,255,.65);
+    .header-bar .company {
+        font-size: 10px;
+        color: rgba(255,255,255,.9);
     }
     .header-bar .title {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 700;
-        margin-top: 6px;
+        margin-top: 3px;
+    }
+    .header-bar .slide-no {
+        font-size: 11px;
+        color: rgba(255,255,255,.65);
+        flex-shrink: 0;
     }
 
-    .cover {
-        background: linear-gradient(135deg, #800000, #a00000, #c00000);
-        padding: 60px 50px;
+    /* ================= COVER ================= */
+    .cover-wrapper {
+        display: flex;
         border-radius: 10px;
-        color: #fff;
-        min-height: 500px;
+        overflow: hidden;
+        min-height: 620px;
+        box-shadow: 0 10px 40px rgba(0,0,0,.3);
+        position: relative;
     }
-    .cover h1 { font-size: 34px; font-weight: 900; line-height: 1.2; }
-    .cover .sub { color: #ffd700; font-size: 18px; letter-spacing: 2px; margin-top: 8px; font-weight: 600; }
-    .cover .divider { width: 260px; height: 3px; background: linear-gradient(90deg, #ff6600, transparent); margin: 16px 0; border-radius: 2px; }
-    .cover .info { font-size: 14px; color: #ddd; margin-top: 16px; line-height: 1.9; }
+    .cover-left {
+        flex: 0 0 58%;
+        background: linear-gradient(135deg, #8B0000 0%, #A00000 50%, #C00000 100%);
+        color: #fff;
+        padding: 40px 45px 40px 45px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+    }
+    .cover-left .logo {
+        position: absolute;
+        top: 25px;
+        left: 35px;
+        height: 55px;
+    }
+    .cover-left .top-line {
+        width: 100%;
+        height: 1px;
+        background: rgba(255,255,255,.25);
+        margin: 55px 0 22px 0;
+    }
+    .cover-left h1 {
+        font-size: 42px;
+        font-weight: 900;
+        line-height: 1.12;
+        letter-spacing: 1px;
+        color: #fff;
+        margin: 0;
+        text-transform: uppercase;
+    }
+    .cover-left .sub {
+        font-size: 19px;
+        font-weight: 700;
+        color: #ffd700;
+        margin-top: 14px;
+        letter-spacing: 2px;
+        line-height: 1.3;
+        text-transform: uppercase;
+    }
+    .cover-left .divider {
+        width: 100%;
+        height: 1px;
+        background: rgba(255,255,255,.3);
+        margin: 20px 0;
+    }
+    .cover-left .company {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        line-height: 1.5;
+        margin-bottom: 6px;
+    }
+    .cover-left .center {
+        font-size: 13px;
+        font-weight: 400;
+        color: rgba(255,255,255,.85);
+        line-height: 1.5;
+        margin-bottom: 22px;
+    }
+    .cover-left .info {
+        font-size: 13px;
+        color: #fff;
+        line-height: 2;
+    }
+    .cover-left .info strong { font-weight: 700; }
+    .cover-right {
+        flex: 1;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    .cover-right::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(90deg, rgba(139,0,0,.55) 0%, transparent 35%);
+    }
 
+    /* ================= SECTION ================= */
     .section {
         background: linear-gradient(135deg, #800020, #cc0000);
         padding: 80px 40px;
@@ -58,8 +171,9 @@ st.markdown("""
     }
     .section h2 { font-size: 40px; font-weight: 800; letter-spacing: 2px; }
     .section .sub { font-size: 22px; color: #fff; font-weight: 300; letter-spacing: 2px; margin-top: 12px; }
-    .section p { font-size: 15px; color: rgba(255,255,255,.85); margin-top: 16px; }
+    .section p { font-size: 15px; color: rgba(255,255,255,.85); margin-top: 16px; max-width: 700px; margin-left: auto; margin-right: auto; }
 
+    /* ================= CLOSING ================= */
     .closing {
         background: linear-gradient(135deg, #CC0000, #D32F2F);
         padding: 80px 40px;
@@ -68,8 +182,9 @@ st.markdown("""
         color: #fff;
         min-height: 420px;
     }
-    .closing h2 { font-size: 40px; font-weight: 800; }
+    .closing h2 { font-size: 42px; font-weight: 800; }
 
+    /* ================= CARD ================= */
     .card {
         background: #F5F5F5;
         border-left: 4px solid #CC0000;
@@ -78,11 +193,11 @@ st.markdown("""
         margin-bottom: 10px;
         font-size: 14px;
         color: #333;
+        transition: all .3s;
     }
     .card:hover {
         box-shadow: 0 4px 12px rgba(204,0,0,.15);
         transform: translateY(-2px);
-        transition: all .3s;
     }
 
     .kpi {
@@ -129,11 +244,25 @@ st.markdown("""
     .flow-box.act { background: #CC0000; color: #fff; }
     .arrow { text-align: center; color: #CC0000; font-size: 22px; font-weight: 700; }
 
-    .footer-note {
-        text-align: center;
-        color: #666;
-        font-size: 12px;
-        margin-top: 20px;
+    /* Dots điều hướng */
+    .dots-wrap {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        padding: 14px 0 4px 0;
+        flex-wrap: wrap;
+    }
+    .dot {
+        width: 9px; height: 9px;
+        border-radius: 50%;
+        background: rgba(204,0,0,.25);
+        display: inline-block;
+        transition: all .3s;
+    }
+    .dot.active {
+        background: #CC0000;
+        transform: scale(1.4);
+        box-shadow: 0 0 8px rgba(204,0,0,.5);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -141,14 +270,14 @@ st.markdown("""
 
 # ===================== DỮ LIỆU SLIDES =====================
 SLIDES = [
-    # 0
+    # 0 - COVER
     {"type": "cover",
      "title": "ĐÀO TẠO PHÒNG CHÁY CHỮA CHÁY",
      "subtitle": "NHÀ MÁY ĐIỆN GIÓ YANG TRUNG – CHƠ LONG",
      "lines": [
         "CÔNG TY TNHH DỊCH VỤ VÀ KỸ THUẬT NĂNG LƯỢNG PECC2",
         "TRUNG TÂM QUẢN LÝ VẬN HÀNH NHÀ MÁY ĐIỆN",
-        "**Người trình bày:** Trương Hoàng An  |  **Mã quy trình:** CLWP-QT-07",
+        "Người trình bày: Trương Hoàng An  |  Mã quy trình: CLWP-QT-07",
      ]},
     # 1
     {"type": "toc", "title": "MỤC LỤC – KẾT CẤU CHƯƠNG TRÌNH ĐÀO TẠO",
@@ -497,14 +626,16 @@ SLIDES = [
 
 # ===================== RENDER =====================
 def render_header(title, idx, total):
+    logo_b64 = img_to_base64(LOGO_PATH)
+    logo_html = f'<img class="hdr-logo" src="data:image/png;base64,{logo_b64}">' if logo_b64 else ''
     st.markdown(f"""
     <div class="header-bar">
-        <div class="company">
-            CÔNG TY TNHH DV & KT NĂNG LƯỢNG PECC2<br>
-            TRUNG TÂM QLVH NHÀ MÁY ĐIỆN
-            <span class="slide-no">{idx} / {total}</span>
+        {logo_html}
+        <div class="hdr-info">
+            <div class="company">CÔNG TY TNHH DV & KT NĂNG LƯỢNG PECC2 &nbsp;|&nbsp; TRUNG TÂM QLVH NHÀ MÁY ĐIỆN</div>
+            <div class="title">📑 {title}</div>
         </div>
-        <div class="title">📑 {title}</div>
+        <div class="slide-no">{idx} / {total}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -512,21 +643,35 @@ def render_header(title, idx, total):
 def render_slide(slide, idx, total):
     stype = slide.get("type", "content")
 
+    # -------- COVER --------
     if stype == "cover":
+        logo_b64 = img_to_base64(LOGO_PATH)
+        bg_b64 = img_to_base64(BG_PATH)
+
+        logo_html = f'<img class="logo" src="data:image/png;base64,{logo_b64}">' if logo_b64 else ''
+        bg_style = f'background-image: url("data:image/jpeg;base64,{bg_b64}");' if bg_b64 else 'background: #333;'
+
         st.markdown(f"""
-        <div class="cover">
-            <h1>{slide['title']}</h1>
-            <div class="sub">{slide.get('subtitle','')}</div>
-            <div class="divider"></div>
-            <div class="info">
-                {slide['lines'][0]}<br>
-                {slide['lines'][1]}<br><br>
-                {slide['lines'][2]}
+        <div class="cover-wrapper">
+            <div class="cover-left">
+                {logo_html}
+                <div class="top-line"></div>
+                <h1>ĐÀO TẠO PHÒNG<br>CHÁY CHỮA CHÁY</h1>
+                <div class="sub">NHÀ MÁY ĐIỆN GIÓ YANG TRUNG –<br>CHƠ LONG</div>
+                <div class="divider"></div>
+                <div class="company">CÔNG TY TNHH DỊCH VỤ VÀ KỸ THUẬT NĂNG LƯỢNG<br>PECC2</div>
+                <div class="center">TRUNG TÂM QUẢN LÝ VẬN HÀNH NHÀ MÁY ĐIỆN</div>
+                <div class="info">
+                    <strong>Người trình bày:</strong> Trương Hoàng An<br>
+                    <strong>Mã quy trình:</strong> CLWP-QT-07
+                </div>
             </div>
+            <div class="cover-right" style="{bg_style}"></div>
         </div>
         """, unsafe_allow_html=True)
         return
 
+    # -------- SECTION --------
     if stype == "section":
         st.markdown(f"""
         <div class="section">
@@ -537,6 +682,7 @@ def render_slide(slide, idx, total):
         """, unsafe_allow_html=True)
         return
 
+    # -------- CLOSING --------
     if stype == "closing":
         st.markdown(f"""
         <div class="closing">
@@ -548,7 +694,7 @@ def render_slide(slide, idx, total):
         """, unsafe_allow_html=True)
         return
 
-    # Các slide có header
+    # -------- HEADER cho các slide còn lại --------
     render_header(slide.get("title", ""), idx, total)
 
     if stype == "toc":
@@ -618,8 +764,8 @@ def render_slide(slide, idx, total):
             cols = st.columns(len(row) * 2 - 1)
             for i, box in enumerate(row):
                 with cols[i * 2]:
-                    cls = "flow-box act" if i == 0 and box else "flow-box"
-                    st.markdown(f"<div class='{cls}'>{box}</div>", unsafe_allow_html=True)
+                    cls = "flow-box act" if box and i == 0 else "flow-box"
+                    st.markdown(f"<div class='{cls}'>{box if box else '&nbsp;'}</div>", unsafe_allow_html=True)
                 if i < len(row) - 1:
                     with cols[i * 2 + 1]:
                         st.markdown("<div class='arrow'>→</div>", unsafe_allow_html=True)
@@ -659,25 +805,38 @@ if "slide_idx" not in st.session_state:
 
 TOTAL = len(SLIDES)
 
-# Nút điều hướng trên cùng
-c1, c2, c3, c4 = st.columns([1, 1, 6, 1])
-with c1:
-    if st.button("◀ Trước", use_container_width=True):
-        st.session_state.slide_idx = (st.session_state.slide_idx - 1) % TOTAL
-with c4:
-    if st.button("Tiếp ▶", use_container_width=True):
-        st.session_state.slide_idx = (st.session_state.slide_idx + 1) % TOTAL
-with c3:
-    st.markdown(f"<div style='text-align:center;color:#666;padding-top:6px'>Slide {st.session_state.slide_idx + 1} / {TOTAL}</div>", unsafe_allow_html=True)
-
 # Render slide hiện tại
 render_slide(SLIDES[st.session_state.slide_idx], st.session_state.slide_idx + 1, TOTAL)
 
-# Chọn slide bằng selectbox
-st.markdown("---")
-options = [f"{i+1}. {s.get('title', s.get('subtitle',''))}" for i, s in enumerate(SLIDES)]
-sel = st.selectbox("Chọn slide", options, index=st.session_state.slide_idx, label_visibility="collapsed")
-new_idx = options.index(sel)
-if new_idx != st.session_state.slide_idx:
-    st.session_state.slide_idx = new_idx
-    st.rerun()
+# ===================== ĐIỀU HƯỚNG DƯỚI =====================
+st.markdown("<br>", unsafe_allow_html=True)
+
+nav1, nav2, nav3 = st.columns([1, 3, 1])
+
+with nav1:
+    if st.button("◀ Trước", key="prev_btn", use_container_width=True):
+        st.session_state.slide_idx = (st.session_state.slide_idx - 1) % TOTAL
+        st.rerun()
+
+with nav2:
+    # Dots
+    dots_html = "<div class='dots-wrap'>"
+    for i in range(TOTAL):
+        cls = "dot active" if i == st.session_state.slide_idx else "dot"
+        dots_html += f"<span class='{cls}'></span>"
+    dots_html += "</div>"
+    st.markdown(dots_html, unsafe_allow_html=True)
+
+with nav3:
+    if st.button("Tiếp ▶", key="next_btn", use_container_width=True):
+        st.session_state.slide_idx = (st.session_state.slide_idx + 1) % TOTAL
+        st.rerun()
+
+# ===================== CHỌN SLIDE =====================
+with st.expander("🔍 Chuyển nhanh đến slide"):
+    options = [f"{i+1}. {s.get('title', s.get('subtitle',''))}" for i, s in enumerate(SLIDES)]
+    sel = st.selectbox("Chọn slide", options, index=st.session_state.slide_idx, label_visibility="collapsed")
+    new_idx = options.index(sel)
+    if new_idx != st.session_state.slide_idx:
+        st.session_state.slide_idx = new_idx
+        st.rerun()
