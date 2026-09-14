@@ -17,7 +17,6 @@ BG_PATH = "images/trang_trai_gio.jpg"
 
 @st.cache_data
 def img_to_base64(path):
-    """Đọc ảnh → base64 để nhúng vào HTML"""
     try:
         with open(path, "rb") as f:
             return base64.b64encode(f.read()).decode()
@@ -36,59 +35,75 @@ def load_image(path):
 st.markdown("""
 <style>
     .main { background: #ffffff; }
-    .block-container { padding: 1rem 2rem 3rem 2rem; max-width: 1300px; }
+    .block-container { padding: 0.5rem 1.5rem 2rem 1.5rem; max-width: 1400px; }
 
     /* ================= HEADER ================= */
     .header-bar {
         background: linear-gradient(135deg, #cc0000, #990000);
         color: #fff;
-        padding: 8px 22px;
+        padding: 10px 22px;
         border-radius: 6px;
-        margin-bottom: 14px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
+        margin-bottom: 0;
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+        box-sizing: border-box;
+    }
+    .header-bar .hdr-left {
+        display: table-cell;
+        vertical-align: middle;
+        width: 55px;
     }
     .header-bar .hdr-logo {
-        height: 30px;
-        flex-shrink: 0;
+        height: 34px;
+        vertical-align: middle;
+        display: block;
     }
-    .header-bar .hdr-info {
-        flex: 1;
-        line-height: 1.3;
+    .header-bar .hdr-mid {
+        display: table-cell;
+        vertical-align: middle;
+        padding-left: 12px;
+        line-height: 1.35;
     }
     .header-bar .company {
         font-size: 10px;
-        color: rgba(255,255,255,.9);
+        color: rgba(255,255,255,.92);
+        letter-spacing: .3px;
     }
-    .header-bar .title {
-        font-size: 14px;
-        font-weight: 700;
-        margin-top: 3px;
-    }
-    .header-bar .slide-no {
+    .header-bar .hdr-right {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: right;
+        width: 70px;
         font-size: 11px;
-        color: rgba(255,255,255,.65);
-        flex-shrink: 0;
+        color: rgba(255,255,255,.7);
+    }
+    .header-title {
+        color: #CC0000;
+        font-size: 17px;
+        font-weight: 700;
+        margin: 10px 0 14px 0;
+        padding: 0;
+        display: block;
     }
 
     /* ================= COVER ================= */
     .cover-wrapper {
-        display: flex;
+        display: table;
+        width: 100%;
         border-radius: 10px;
         overflow: hidden;
         min-height: 620px;
         box-shadow: 0 10px 40px rgba(0,0,0,.3);
-        position: relative;
+        table-layout: fixed;
     }
     .cover-left {
-        flex: 0 0 58%;
+        display: table-cell;
+        width: 58%;
         background: linear-gradient(135deg, #8B0000 0%, #A00000 50%, #C00000 100%);
         color: #fff;
-        padding: 40px 45px 40px 45px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        padding: 40px 45px;
+        vertical-align: middle;
         position: relative;
     }
     .cover-left .logo {
@@ -148,16 +163,20 @@ st.markdown("""
     }
     .cover-left .info strong { font-weight: 700; }
     .cover-right {
-        flex: 1;
+        display: table-cell;
+        width: 42%;
         background-size: cover;
         background-position: center;
+        background-repeat: no-repeat;
         position: relative;
+        vertical-align: middle;
     }
     .cover-right::after {
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(90deg, rgba(139,0,0,.55) 0%, transparent 35%);
+        background: linear-gradient(90deg, rgba(139,0,0,.5) 0%, transparent 30%);
+        pointer-events: none;
     }
 
     /* ================= SECTION ================= */
@@ -249,7 +268,7 @@ st.markdown("""
         display: flex;
         justify-content: center;
         gap: 6px;
-        padding: 14px 0 4px 0;
+        padding: 12px 0 4px 0;
         flex-wrap: wrap;
     }
     .dot {
@@ -270,7 +289,6 @@ st.markdown("""
 
 # ===================== DỮ LIỆU SLIDES =====================
 SLIDES = [
-    # 0 - COVER
     {"type": "cover",
      "title": "ĐÀO TẠO PHÒNG CHÁY CHỮA CHÁY",
      "subtitle": "NHÀ MÁY ĐIỆN GIÓ YANG TRUNG – CHƠ LONG",
@@ -279,7 +297,6 @@ SLIDES = [
         "TRUNG TÂM QUẢN LÝ VẬN HÀNH NHÀ MÁY ĐIỆN",
         "Người trình bày: Trương Hoàng An  |  Mã quy trình: CLWP-QT-07",
      ]},
-    # 1
     {"type": "toc", "title": "MỤC LỤC – KẾT CẤU CHƯƠNG TRÌNH ĐÀO TẠO",
      "items": [
         ("A", "Nền tảng về cháy & khung pháp lý PCCC", "Khái niệm sự cháy, điều kiện, nguyên nhân, quy định pháp luật, hồ sơ PCCC"),
@@ -287,25 +304,21 @@ SLIDES = [
         ("C", "Quy trình kiểm tra, vận hành & bảo trì", "Kiểm tra định kỳ, thao tác tủ báo cháy, bảo dưỡng thiết bị"),
         ("D", "Ứng phó khẩn cấp & xử lý sự cố", "Quy trình chữa cháy, PASS, vận hành FM-200, kỹ năng thoát hiểm"),
      ]},
-    # 2
     {"type": "section", "title": "PHẦN A",
      "subtitle": "NỀN TẢNG VỀ CHÁY & KHUNG PHÁP LÝ PCCC",
      "lines": ["Hiểu bản chất sự cháy, quy định pháp luật và trách nhiệm PCCC — nền tảng để vận hành đúng hệ thống thiết bị của nhà máy."]},
-    # 3
     {"type": "cards", "title": "PCCC – TẠI SAO CẦN THIẾT?", "cols": 3,
      "items": [
         ("🛡️", "Bảo vệ tính mạng & tài sản", "Nhà máy điện có nguy cơ cháy nổ cao (điện, pin, dầu MBA)."),
         ("⚡", "Đảm bảo ổn định điện", "Nhà máy cung cấp năng lượng tái tạo quốc gia."),
         ("📋", "Yêu cầu pháp lý", "Luật PCCC & CNCH, NĐ 105/2025, TT 36/2025, QCVN 10:2025."),
      ]},
-    # 4
     {"type": "cards", "title": "KHÁI NIỆM VỀ SỰ CHÁY", "cols": 3,
      "items": [
         ("📐", "Theo khoa học PCCC", "Quá trình biến đổi lý–hóa: chất cháy + chất oxy hóa + nguồn nhiệt → tỏa nhiệt, phát sáng."),
         ("⚖️", "Theo Luật PCCC", "Phản ứng hóa học có tỏa nhiệt, phát ánh sáng hoặc khói, gây thiệt hại."),
         ("⚗️", "Bản chất", "Phản ứng hóa học – Tỏa nhiệt – Phát sáng."),
      ]},
-    # 5
     {"type": "table", "title": "BA YẾU TỐ CẦN THIẾT CHO SỰ CHÁY",
      "headers": ["Yếu tố", "Khái niệm", "Ví dụ tại nhà máy"],
      "rows": [
@@ -313,7 +326,6 @@ SLIDES = [
         ["⚡ Nguồn nhiệt", "Nguồn cung cấp năng lượng", "Chập mạch, quá tải, ma sát, sét"],
         ["🌬️ Chất oxy hóa", "Chất tham gia phản ứng", "Oxy trong không khí (~21%)"],
      ]},
-    # 6
     {"type": "list", "title": "BỐN ĐIỀU KIỆN CẦN THIẾT CHO SỰ CHÁY",
      "lines": [
         "**1. Tiếp xúc trực tiếp** – Chất cháy, chất oxy hóa, nguồn nhiệt phải tiếp xúc.",
@@ -322,7 +334,6 @@ SLIDES = [
         "**4. Đạt nhiệt độ tự bắt cháy** – Nguồn nhiệt nung nóng hỗn hợp tới nhiệt độ tự bắt cháy.",
         "→ Chỉ cần loại bỏ **MỘT** trong 4 điều kiện là ngăn được cháy.",
      ]},
-    # 7
     {"type": "cards", "title": "NGUYÊN NHÂN CHÁY", "cols": 3,
      "items": [
         ("🌩️", "Tự nhiên", "Sét đánh, tự cháy vật liệu."),
@@ -332,7 +343,6 @@ SLIDES = [
         ("🔴", "Cố ý", "Phá hoại, che giấu tội phạm."),
         ("❓", "Nguyên nhân khác", "Tai nạn, bất khả kháng."),
      ]},
-    # 8
     {"type": "table", "title": "NGUY CƠ CHÁY ĐẶC THÙ TẠI NHÀ MÁY ĐIỆN GIÓ",
      "headers": ["Khu vực", "Nguy cơ cháy chính", "Nguồn nhiệt điển hình"],
      "rows": [
@@ -341,7 +351,6 @@ SLIDES = [
         ["Phòng Datacenter/điều khiển", "Cháy thiết bị điện tử", "Quá tải, chập mạch bo mạch"],
         ["Tuabin gió (nacelle)", "Cháy dầu bôi trơn, hộp số", "Ma sát cơ khí, sét đánh"],
      ]},
-    # 9
     {"type": "two-col", "title": "PHẠM VI ÁP DỤNG & ĐỐI TƯỢNG",
      "left_title": "📍 Phạm vi áp dụng",
      "left_lines": [
@@ -357,7 +366,6 @@ SLIDES = [
         "Nhân viên bảo vệ",
      ],
      "note": "**Chỉ huy chữa cháy:** Người đứng đầu → Đội trưởng PCCC → Trưởng ca"},
-    # 10
     {"type": "cards", "title": "HỒ SƠ QUẢN LÝ PCCC CỦA NHÀ MÁY", "cols": 3,
      "items": [
         ("📄", "PC01", "Thông tin cơ sở"),
@@ -370,31 +378,26 @@ SLIDES = [
         ("🎓", "CN huấn luyện", "Đã qua đào tạo"),
         ("📎", "Khác", "Bản vẽ, BH..."),
      ]},
-    # 11
     {"type": "two-col", "title": "TRÁCH NHIỆM & CHẾ ĐỘ KIỂM TRA PCCC",
      "left_title": "🔄 Thường xuyên",
      "left_lines": ["Không quá 1 tháng/lần", "Duy trì an toàn nguồn lửa/nhiệt", "Phương tiện PCCC, lối thoát nạn"],
      "right_title": "📅 Định kỳ",
      "right_lines": ["6 tháng hoặc 1 năm tùy phân loại", "Biên bản Mẫu PC02"],
      "note": "**Trách nhiệm hình sự:** Điều 313 BLHS – phạt tù đến 12 năm."},
-    # 12
     {"type": "section", "title": "PHẦN B",
      "subtitle": "HỆ THỐNG PCCC TẠI NHÀ MÁY ĐIỆN GIÓ YANG TRUNG – CHƠ LONG",
      "lines": ["Cấu trúc, thiết bị và nguyên lý hoạt động của hệ thống báo cháy & chữa cháy thực tế đang lắp đặt tại nhà máy."]},
-    # 13
     {"type": "two-col", "title": "TỔNG QUAN HỆ THỐNG PCCC",
      "left_title": "🔥 Hệ thống báo cháy",
      "left_lines": ["Tủ Hochiki L@titude (2 loop)", "Đầu báo khói/nhiệt, module địa chỉ", "Chuông còi đèn cảnh báo"],
      "right_title": "💧 Hệ thống chữa cháy",
      "right_lines": ["Bơm chữa cháy 75kW", "Tủ HCVR-3 FM-200", "Phun sương trạm BA", "Bình MFZ/ABC"],
      },
-    # 14
     {"type": "flow", "title": "SƠ ĐỒ KHỐI HỆ THỐNG PCCC",
      "rows": [
         ["Phát hiện cháy", "Báo cháy trung tâm", "Cảnh báo sơ tán"],
         ["Kích hoạt chữa cháy", "Bơm / FM-200 / Phun sương", "Kiểm soát đám cháy"],
      ]},
-    # 15
     {"type": "list", "title": "NGUYÊN LÝ HOẠT ĐỘNG BÁO CHÁY",
      "lines": [
         "🔍 Đầu báo khói/nhiệt phát hiện dấu hiệu cháy",
@@ -402,7 +405,6 @@ SLIDES = [
         "🔔 Kích hoạt chuông, còi, đèn cảnh báo",
         "🖥️ Hiển thị vị trí cháy trên màn hình tủ báo",
      ]},
-    # 16
     {"type": "cards", "title": "CÁC THÀNH PHẦN HỆ THỐNG BÁO CHÁY", "cols": 4,
      "items": [
         ("🔍", "Đầu báo", "Khói quang, khói địa chỉ, nhiệt"),
@@ -410,7 +412,6 @@ SLIDES = [
         ("💻", "Trung tâm", "L@titude LA303H1-10"),
         ("🔔", "Cảnh báo", "Chuông, còi, đèn, nút nhấn"),
      ]},
-    # 17
     {"type": "table", "title": "PHÂN LOẠI ĐẦU BÁO CHÁY",
      "headers": ["Loại đầu báo", "Nguyên lý", "Ứng dụng", "Đặc điểm"],
      "rows": [
@@ -419,7 +420,6 @@ SLIDES = [
         ["Nhiệt gia tăng", "Màng đàn hồi + buồng khí", "Bếp, nhà máy, bụi ẩm", "Chống báo giả"],
         ["Nhiệt chống nổ FFH-2E120", "Cảm biến nhiệt chống cháy nổ", "Trạm BA, KV nguy hiểm", "An toàn cao"],
      ]},
-    # 18
     {"type": "table", "title": "SO SÁNH CONVENTIONAL vs ADDRESSABLE",
      "headers": ["Tiêu chí", "Conventional", "Addressable"],
      "rows": [
@@ -428,7 +428,6 @@ SLIDES = [
         ["Báo giả", "Có thể", "Phát hiện độ bẩn"],
         ["Môi trường", "VP, hành lang", "Bếp, xưởng, BA"],
      ]},
-    # 19
     {"type": "cards", "title": "CÁC MODULE TRONG HỆ THỐNG BÁO CHÁY", "cols": 5,
      "items": [
         ("🔌", "DCP-CZM", "Chuyển đầu báo thường → địa chỉ"),
@@ -437,7 +436,6 @@ SLIDES = [
         ("🔌", "DCP-R2ML", "Relay điều khiển"),
         ("🔌", "DCP-SCI", "Cách ly ngắn mạch Loop"),
      ]},
-    # 20
     {"type": "list", "title": "TỦ HOCHIKI L@TITUDE LA303H1-10",
      "lines": [
         "**2 loop** địa chỉ",
@@ -447,7 +445,6 @@ SLIDES = [
         "**Bo S770** – Relay",
         "**Nguồn S406** – 24Vdc, sạc pin 7-60AH",
      ]},
-    # 21
     {"type": "two-col", "title": "VẬN HÀNH TỦ BÁO CHÁY & CÁC TRẠNG THÁI",
      "left_title": "Thao tác xem trạng thái",
      "left_lines": [
@@ -462,7 +459,6 @@ SLIDES = [
         "⚠️ Sự cố (Trouble)",
         "🔥 Báo cháy – FIRE",
      ]},
-    # 22
     {"type": "table", "title": "CÁC NÚT NHẤN TRÊN TỦ BÁO CHÁY",
      "headers": ["Nút", "Chức năng", "Trạng thái"],
      "rows": [
@@ -471,18 +467,15 @@ SLIDES = [
         ["TEST", "Kiểm tra đèn, chuông, còi", "Bảo trì"],
         ["BUZZER", "Kiểm tra còi báo", "Bảo trì"],
      ]},
-    # 23
     {"type": "cards", "title": "HỆ THỐNG CHỮA CHÁY – TỔNG QUAN", "cols": 3,
      "items": [
         ("💧", "Chữa cháy nước", "Bơm chính 75kW, dự phòng 75kW, Jockey"),
         ("🧯", "Khí FM-200", "Tủ HCVR-3, 3 bình, bảo vệ khu kín"),
         ("💨", "Phun sương BA", "HV14 360°, STV-NZ phun khí"),
      ]},
-    # 24
     {"type": "kpi", "title": "BƠM CHỮA CHÁY & CHẾ ĐỘ VẬN HÀNH",
      "kpis": [("75 kW", "Bơm chính Electric"), ("75 kW", "Bơm dự phòng Electric"), ("Jockey", "Bơm bù áp")],
      "note": "⚙️ Tự động: Tủ ECS điều khiển theo tín hiệu áp suất/báo cháy  |  ✋ Bằng tay: Start/Stop trực tiếp trên tủ bơm"},
-    # 25
     {"type": "list", "title": "TỦ HCVR-3 FM-200 & KHU VỰC BẢO VỆ",
      "lines": [
         "**03 bình FM-200** trong tủ van",
@@ -491,18 +484,15 @@ SLIDES = [
         "**Auto / Manual** van chuyển mạch",
         "Khu vực: 🏗️ Datacenter | 📦 Pin/Accu | ⚡ 22kV",
      ]},
-    # 26
     {"type": "two-col", "title": "BÌNH CHỮA CHÁY MFZ/ABC, CO₂ & KIỂM TRA",
      "left_title": "🧯 MFZ/ABC8 – Bột khô",
      "left_lines": ["Dập cháy A, B, C", "An toàn thiết bị điện"],
      "right_title": "🧯 Bình CO₂",
      "right_lines": ["Chữa cháy TB điện tử", "Không cặn"],
      "note": "Kiểm tra: 📊 Kim áp XANH | 🔒 Chốt an toàn | 🔍 Không móp/rỉ | 📅 Còn hạn KĐ"},
-    # 27
     {"type": "kpi", "title": "HỆ THỐNG PHUN SƯƠNG CAO ÁP & TRẠM BA",
      "kpis": [("90°C", "Nhiệt kích hoạt"), ("D65/D50", "Ống STK"), ("1.2m", "Khoảng cách HV14")],
      "note": "💨 Đầu HV14 phun sương 360°  |  🌊 Đầu STV-NZ phun khí 360°  |  ⚡ Bảo vệ toàn bộ trạm biến áp"},
-    # 28
     {"type": "table", "title": "PHÂN LOẠI ĐÁM CHÁY & CHẤT CHỮA CHÁY",
      "headers": ["Chất chữa cháy", "Loại", "Ưu/Nhược điểm"],
      "rows": [
@@ -511,7 +501,6 @@ SLIDES = [
         ["FM-200", "A, B, E", "Sạch, bảo vệ điện tử / Đắt"],
         ["Phun sương", "A, B, E", "Làm mát, ít hư hại / Áp cao"],
      ]},
-    # 29
     {"type": "cards", "title": "THIẾT BỊ PHỤ TRỢ CHỮA CHÁY", "cols": 4,
      "items": [
         ("🔌", "Họng DN65", ""),
@@ -519,18 +508,15 @@ SLIDES = [
         ("🔧", "Cuộn vòi", ""),
         ("💨", "HV14/STV-NZ", ""),
      ]},
-    # 30
     {"type": "section", "title": "PHẦN C",
      "subtitle": "QUY TRÌNH KIỂM TRA, VẬN HÀNH & BẢO TRÌ",
      "lines": ["Áp dụng 3 phương pháp kiểm tra PCCC vào việc kiểm tra thực tế thiết bị, kết hợp lịch bảo trì định kỳ tại nhà máy."]},
-    # 31
     {"type": "cards", "title": "BA PHƯƠNG PHÁP KIỂM TRA PCCC", "cols": 3,
      "items": [
         ("📚", "1. Nghiên cứu tài liệu", "Đối chiếu hồ sơ thiết kế, lý lịch tủ báo, sổ bảo dưỡng"),
         ("👁️", "2. Quan sát", "Kiểm tra trực quan đầu báo, bình CC, lối thoát nạn"),
         ("📏", "3. Đo, đếm", "Đo áp suất bơm, bình FM-200, thông số kỹ thuật"),
      ]},
-    # 32
     {"type": "table", "title": "NỘI DUNG KIỂM TRA ĐỊNH KỲ",
      "headers": ["Hạng mục", "Nội dung", "Tần suất"],
      "rows": [
@@ -539,13 +525,11 @@ SLIDES = [
         ["Đầu báo, chuông, còi", "Vệ sinh, kiểm tra hoạt động", "Hàng tháng"],
         ["Hệ thống FM-200", "Áp suất, chốt AT, Auto", "6 tháng"],
      ]},
-    # 33
     {"type": "flow", "title": "THAO TÁC KHI CÓ BÁO CHÁY",
      "rows": [
         ["🔔 Báo cháy kích hoạt", "Kiểm tra vị trí trên tủ", "Kiểm tra thực tế"],
         ["🔥 Cháy thật: Gọi 114 + Di tản", "✅ Báo giả: Sửa lỗi + Reset", ""],
      ]},
-    # 34
     {"type": "table", "title": "BẢO TRÌ & LỊCH ĐỊNH KỲ",
      "headers": ["Tần suất", "Hạng mục", "Ghi chú"],
      "rows": [
@@ -555,7 +539,6 @@ SLIDES = [
         ["Quý", "Nút báo, chuông, còi", "Chức năng"],
         ["6 tháng", "FM-200", "Tổng thể"],
      ]},
-    # 35
     {"type": "table", "title": "XỬ LÝ SỰ CỐ BÁO CHÁY",
      "headers": ["Sự cố", "Dấu hiệu", "Nguyên nhân", "Khắc phục"],
      "rows": [
@@ -565,7 +548,6 @@ SLIDES = [
         ["Báo giả", "Fire nhả", "Bụi, côn trùng", "Vệ sinh đầu báo"],
         ["Mất chuông", "Fire, ko chuông", "NAC/relay hỏng", "Ktra NAC, relay"],
      ]},
-    # 36
     {"type": "table", "title": "XỬ LÝ SỰ CỐ BƠM CHỮA CHÁY",
      "headers": ["Hiện tượng", "Nguyên nhân", "Khắc phục"],
      "rows": [
@@ -575,7 +557,6 @@ SLIDES = [
         ["Rung, ồn", "Mất cân bằng, đế lỏng", "Cân chỉnh, bắt chặt"],
         ["Bù áp chạy liên tục", "Van 1 chiều rò", "Phát hiện rò"],
      ]},
-    # 37
     {"type": "list", "title": "TỒN TẠI, THIẾU SÓT KHI TỰ KIỂM TRA",
      "lines": [
         "Chưa xây dựng kế hoạch PCCC hàng năm, tuyên truyền, huấn luyện",
@@ -585,18 +566,15 @@ SLIDES = [
         "Không phúc tra khắc phục kiến nghị lần kiểm tra trước",
         "**Khuyến nghị:** Lập KH năm, phân công phụ trách, niêm yết HD, tổ chức thực tập 1 lần/năm.",
      ]},
-    # 38
     {"type": "section", "title": "PHẦN D",
      "subtitle": "ỨNG PHÓ KHẨN CẤP & KỸ NĂNG XỬ LÝ",
      "lines": ["Quy trình hành động khi có cháy thật, thao tác chữa cháy ban đầu và kỹ năng vận hành hệ thống chữa cháy tự động."]},
-    # 39
     {"type": "list", "title": "QUY TRÌNH ỨNG PHÓ KHẨN CẤP",
      "lines": [
         "**Bước 1 – Phát hiện:** Hét 'CHÁY!' → Nhấn nút báo cháy → Ngắt cầu dao điện",
         "**Bước 2 – Ứng phó:** Gọi 114 → Sơ tán → Dùng bình CC ban đầu → Di chuyển vật dễ cháy",
         "**Bước 3 – Phối hợp:** Di chuyển theo lối thoát hiểm → Đón lực lượng PCCC → Theo chỉ huy",
      ]},
-    # 40
     {"type": "list", "title": "VẬN HÀNH HCVR-3 FM-200 (6 BƯỚC)",
      "lines": [
         "**1. Phát hiện:** Đầu báo khói/nhiệt kích hoạt (VESDA)",
@@ -606,7 +584,6 @@ SLIDES = [
         "**5. Reset:** Khóa van bằng tay, nạp lại FM-200",
         "**6. Kiểm tra:** Áp suất & mức khí sau phun",
      ]},
-    # 41
     {"type": "pass", "title": "HƯỚNG DẪN SỬ DỤNG BÌNH CHỮA CHÁY – PASS",
      "items": [
         ("P", "Pull", "Rút chốt an toàn"),
@@ -614,7 +591,6 @@ SLIDES = [
         ("S", "Squeeze", "Bóp tay cầm phun"),
         ("S", "Sweep", "Quét ngang qua"),
      ]},
-    # 42
     {"type": "closing", "title": "PHÒNG CHÁY HƠN CHỮA CHÁY",
      "subtitle": "AN TOÀN LÀ TRÊN HẾT",
      "lines": [
@@ -624,22 +600,23 @@ SLIDES = [
 ]
 
 
-# ===================== RENDER =====================
-def render_header(title, idx, total):
+# ===================== RENDER HEADER =====================
+def render_header(idx, total):
+    """Chỉ render header (logo + tên công ty + số slide). KHÔNG chứa tiêu đề."""
     logo_b64 = img_to_base64(LOGO_PATH)
     logo_html = f'<img class="hdr-logo" src="data:image/png;base64,{logo_b64}">' if logo_b64 else ''
     st.markdown(f"""
     <div class="header-bar">
-        {logo_html}
-        <div class="hdr-info">
-            <div class="company">CÔNG TY TNHH DV & KT NĂNG LƯỢNG PECC2 &nbsp;|&nbsp; TRUNG TÂM QLVH NHÀ MÁY ĐIỆN</div>
-            <div class="title">📑 {title}</div>
+        <div class="hdr-left">{logo_html}</div>
+        <div class="hdr-mid">
+            <div class="company">CÔNG TY TNHH DV &amp; KT NĂNG LƯỢNG PECC2 &nbsp;|&nbsp; TRUNG TÂM QLVH NHÀ MÁY ĐIỆN</div>
         </div>
-        <div class="slide-no">{idx} / {total}</div>
+        <div class="hdr-right">{idx} / {total}</div>
     </div>
     """, unsafe_allow_html=True)
 
 
+# ===================== RENDER SLIDE =====================
 def render_slide(slide, idx, total):
     stype = slide.get("type", "content")
 
@@ -647,9 +624,8 @@ def render_slide(slide, idx, total):
     if stype == "cover":
         logo_b64 = img_to_base64(LOGO_PATH)
         bg_b64 = img_to_base64(BG_PATH)
-
         logo_html = f'<img class="logo" src="data:image/png;base64,{logo_b64}">' if logo_b64 else ''
-        bg_style = f'background-image: url("data:image/jpeg;base64,{bg_b64}");' if bg_b64 else 'background: #333;'
+        bg_style = f"background-image:url('data:image/jpeg;base64,{bg_b64}');" if bg_b64 else 'background:#333;'
 
         st.markdown(f"""
         <div class="cover-wrapper">
@@ -695,8 +671,12 @@ def render_slide(slide, idx, total):
         return
 
     # -------- HEADER cho các slide còn lại --------
-    render_header(slide.get("title", ""), idx, total)
+    render_header(idx, total)
+    # Tiêu đề tách riêng, nằm dưới header
+    st.markdown(f'<div class="header-title">📑 {slide.get("title", "")}</div>',
+                unsafe_allow_html=True)
 
+    # -------- TOC --------
     if stype == "toc":
         cols = st.columns(2)
         colors = [("#CC0000", "linear-gradient(145deg,#fff5f5,#fff)"),
@@ -717,6 +697,7 @@ def render_slide(slide, idx, total):
                 """, unsafe_allow_html=True)
         return
 
+    # -------- CARDS --------
     if stype == "cards":
         cols_n = slide.get("cols", 3)
         cols = st.columns(cols_n)
@@ -732,11 +713,13 @@ def render_slide(slide, idx, total):
                 """, unsafe_allow_html=True)
         return
 
+    # -------- LIST --------
     if stype == "list":
         html = "<ul class='cl'>" + "".join([f"<li>{l}</li>" for l in slide["lines"]]) + "</ul>"
         st.markdown(html, unsafe_allow_html=True)
         return
 
+    # -------- TABLE --------
     if stype == "table":
         headers = slide["headers"]
         rows = slide["rows"]
@@ -747,6 +730,7 @@ def render_slide(slide, idx, total):
         st.markdown(table_md)
         return
 
+    # -------- TWO COL --------
     if stype == "two-col":
         c1, c2 = st.columns(2)
         with c1:
@@ -759,6 +743,7 @@ def render_slide(slide, idx, total):
             st.info(slide["note"])
         return
 
+    # -------- FLOW --------
     if stype == "flow":
         for row in slide["rows"]:
             cols = st.columns(len(row) * 2 - 1)
@@ -771,6 +756,7 @@ def render_slide(slide, idx, total):
                         st.markdown("<div class='arrow'>→</div>", unsafe_allow_html=True)
         return
 
+    # -------- KPI --------
     if stype == "kpi":
         cols = st.columns(len(slide["kpis"]))
         for i, (v, l) in enumerate(slide["kpis"]):
@@ -785,6 +771,7 @@ def render_slide(slide, idx, total):
             st.info(slide["note"])
         return
 
+    # -------- PASS --------
     if stype == "pass":
         cols = st.columns(4)
         for i, (letter, name, desc) in enumerate(slide["items"]):
@@ -808,7 +795,7 @@ TOTAL = len(SLIDES)
 # Render slide hiện tại
 render_slide(SLIDES[st.session_state.slide_idx], st.session_state.slide_idx + 1, TOTAL)
 
-# ===================== ĐIỀU HƯỚNG DƯỚI =====================
+# ===================== ĐIỀU HƯỚNG =====================
 st.markdown("<br>", unsafe_allow_html=True)
 
 nav1, nav2, nav3 = st.columns([1, 3, 1])
@@ -819,7 +806,6 @@ with nav1:
         st.rerun()
 
 with nav2:
-    # Dots
     dots_html = "<div class='dots-wrap'>"
     for i in range(TOTAL):
         cls = "dot active" if i == st.session_state.slide_idx else "dot"
@@ -832,10 +818,11 @@ with nav3:
         st.session_state.slide_idx = (st.session_state.slide_idx + 1) % TOTAL
         st.rerun()
 
-# ===================== CHỌN SLIDE =====================
+# ===================== CHỌN SLIDE NHANH =====================
 with st.expander("🔍 Chuyển nhanh đến slide"):
     options = [f"{i+1}. {s.get('title', s.get('subtitle',''))}" for i, s in enumerate(SLIDES)]
-    sel = st.selectbox("Chọn slide", options, index=st.session_state.slide_idx, label_visibility="collapsed")
+    sel = st.selectbox("Chọn slide", options, index=st.session_state.slide_idx,
+                       label_visibility="collapsed")
     new_idx = options.index(sel)
     if new_idx != st.session_state.slide_idx:
         st.session_state.slide_idx = new_idx
