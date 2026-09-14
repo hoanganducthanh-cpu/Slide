@@ -11,8 +11,8 @@ st.set_page_config(
 )
 
 # ===================== ĐƯỜNG DẪN ẢNH =====================
-LOGO_PATH = "hình ảnh/Horizontal_logo_pese_1.png"
-BG_PATH = "hình ảnh/trang_trai_gio.jpg"
+LOGO_PATH = "images/Horizontal_logo_pese_1.png"
+BG_PATH = "images/trang_trai_gio.jpg"
 
 
 @st.cache_data
