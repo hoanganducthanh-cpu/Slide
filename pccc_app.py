@@ -37,54 +37,69 @@ def load_image(path):
 st.markdown("""
 <style>
     .main { background: #ffffff; }
-    .block-container { padding: 0.5rem 1.5rem 2rem 1.5rem; max-width: 1400px; }
+    .block-container { padding: 0.5rem 1rem 2rem 1rem; max-width: 1400px; }
 
-    /* ================= HEADER (dùng inline-block, KHÔNG table) ================= */
-    .header-bar {
-        background: linear-gradient(135deg, #cc0000, #990000);
-        color: #fff;
-        padding: 10px 22px;
-        border-radius: 6px;
+    /* ================= HEADER MỚI (nền trắng + viền đỏ, giống ảnh mẫu) ================= */
+    .header-wrap {
+        background: #ffffff;
+        border-top: 4px solid #1a237e;
+        border-bottom: 4px solid #1a237e;
+        padding: 12px 24px;
         margin-bottom: 0;
-        overflow: hidden;
-        line-height: 1.35;
-        font-size: 0;              /* xoá khoảng trắng giữa inline-block */
+        position: relative;
+        box-shadow: 0 2px 6px rgba(0,0,0,.08);
     }
-    .header-bar .hdr-left {
+    .header-logo-box {
         display: inline-block;
         vertical-align: middle;
-        width: 55px;
-        font-size: 14px;
+        width: 130px;
     }
-    .header-bar .hdr-logo {
-        height: 34px;
+    .header-logo-box img {
+        height: 55px;
         vertical-align: middle;
-        display: block;
     }
-    .header-bar .hdr-mid {
+    .header-text-box {
         display: inline-block;
         vertical-align: middle;
-        padding-left: 12px;
-        width: calc(100% - 130px);
-        font-size: 10px;
-        color: rgba(255,255,255,.92);
-        letter-spacing: .3px;
-        line-height: 1.4;
+        padding-left: 20px;
+        width: calc(100% - 200px);
+        text-align: center;
     }
-    .header-bar .hdr-right {
-        display: inline-block;
-        vertical-align: middle;
-        text-align: right;
-        width: 60px;
-        font-size: 11px;
-        color: rgba(255,255,255,.75);
+    .header-text-box .company {
+        font-size: 22px;
+        font-weight: 800;
+        color: #1a237e;
+        letter-spacing: .5px;
+        line-height: 1.3;
     }
-    .header-title {
+    .header-text-box .center {
+        font-size: 18px;
+        font-weight: 700;
         color: #CC0000;
+        letter-spacing: .5px;
+        margin-top: 4px;
+    }
+    .header-slide-no {
+        display: inline-block;
+        vertical-align: middle;
+        width: 60px;
+        text-align: right;
+        font-size: 12px;
+        font-weight: 600;
+        color: #999;
+    }
+
+    /* ================= TIÊU ĐỀ SLIDE (nền đỏ, chữ trắng) ================= */
+    .slide-title-bar {
+        background: linear-gradient(135deg, #cc0000, #990000);
+        color: #ffffff;
+        padding: 12px 22px;
         font-size: 17px;
         font-weight: 700;
-        margin: 10px 0 14px 0;
-        display: block;
+        margin: 14px 0 16px 0;
+        border-radius: 6px;
+        letter-spacing: .3px;
+        box-shadow: 0 3px 8px rgba(204,0,0,.2);
     }
 
     /* ================= COVER ================= */
@@ -93,7 +108,6 @@ st.markdown("""
         overflow: hidden;
         min-height: 620px;
         box-shadow: 0 10px 40px rgba(0,0,0,.3);
-        font-size: 0;              /* xoá khoảng trắng inline-block */
     }
     .cover-left {
         display: inline-block;
@@ -105,7 +119,6 @@ st.markdown("""
         box-sizing: border-box;
         min-height: 620px;
         position: relative;
-        font-size: 14px;
     }
     .cover-left .logo {
         position: absolute;
@@ -126,7 +139,6 @@ st.markdown("""
         letter-spacing: 1px;
         color: #fff;
         margin: 0;
-        text-transform: uppercase;
     }
     .cover-left .sub {
         font-size: 19px;
@@ -135,7 +147,6 @@ st.markdown("""
         margin-top: 14px;
         letter-spacing: 2px;
         line-height: 1.3;
-        text-transform: uppercase;
     }
     .cover-left .divider {
         width: 100%;
@@ -152,7 +163,6 @@ st.markdown("""
     }
     .cover-left .center {
         font-size: 13px;
-        font-weight: 400;
         color: rgba(255,255,255,.85);
         line-height: 1.5;
         margin-bottom: 22px;
@@ -172,7 +182,6 @@ st.markdown("""
         background-repeat: no-repeat;
         box-sizing: border-box;
         position: relative;
-        font-size: 14px;
     }
     .cover-right::after {
         content: '';
@@ -573,15 +582,24 @@ SLIDES = [
 ]
 
 
-# ===================== RENDER HEADER (dùng inline-block, KHÔNG table) =====================
+# ===================== RENDER HEADER (giống ảnh mẫu) =====================
 def render_header(idx, total):
+    """Header giống ảnh mẫu: nền trắng + viền xanh navy + logo PESE + tên công ty."""
     logo_b64 = img_to_base64(LOGO_PATH)
-    logo_html = f'<img class="hdr-logo" src="data:image/png;base64,{logo_b64}">' if logo_b64 else ''
+    logo_html = f'<img src="data:image/png;base64,{logo_b64}" alt="PESE">' if logo_b64 else ''
     st.markdown(f"""
-    <div class="header-bar">
-        <span class="hdr-left">{logo_html}</span><span class="hdr-mid">CÔNG TY TNHH DV &amp; KT NĂNG LƯỢNG PECC2 &nbsp;|&nbsp; TRUNG TÂM QLVH NHÀ MÁY ĐIỆN</span><span class="hdr-right">{idx} / {total}</span>
+    <div class="header-wrap">
+        <span class="header-logo-box">{logo_html}</span><span class="header-text-box">
+            <div class="company">CÔNG TY TNHH DỊCH VỤ VÀ KỸ THUẬT NĂNG LƯỢNG PECC2</div>
+            <div class="center">TRUNG TÂM QUẢN LÝ VẬN HÀNH NHÀ MÁY ĐIỆN</div>
+        </span><span class="header-slide-no">{idx}/{total}</span>
     </div>
     """, unsafe_allow_html=True)
+
+
+def render_title_bar(title):
+    """Tiêu đề slide: nền đỏ, chữ trắng."""
+    st.markdown(f'<div class="slide-title-bar">📑 {title}</div>', unsafe_allow_html=True)
 
 
 # ===================== RENDER SLIDE =====================
@@ -636,8 +654,7 @@ def render_slide(slide, idx, total):
 
     # Header + Title cho các slide khác
     render_header(idx, total)
-    st.markdown(f'<div class="header-title">📑 {slide.get("title", "")}</div>',
-                unsafe_allow_html=True)
+    render_title_bar(slide.get("title", ""))
 
     if stype == "toc":
         cols = st.columns(2)
@@ -743,7 +760,6 @@ def render_slide(slide, idx, total):
 
 # ===================== TẠO PPTX =====================
 def build_pptx():
-    """Tạo file PPTX từ dữ liệu SLIDES"""
     try:
         from pptx import Presentation
         from pptx.util import Inches, Pt
@@ -757,285 +773,169 @@ def build_pptx():
 
         RED = RGBColor(0xCC, 0x00, 0x00)
         DARK_RED = RGBColor(0x80, 0x00, 0x00)
+        NAVY = RGBColor(0x1A, 0x23, 0x7E)
         YELLOW = RGBColor(0xFF, 0xD7, 0x00)
         WHITE = RGBColor(0xFF, 0xFF, 0xFF)
         BLACK = RGBColor(0x22, 0x22, 0x22)
         GRAY = RGBColor(0x66, 0x66, 0x66)
 
-        for slide in SLIDES:
+        for idx_s, slide in enumerate(SLIDES):
             stype = slide.get("type", "content")
             s = prs.slides.add_slide(blank)
 
-            # ==================== COVER ====================
             if stype == "cover":
-                # Nền đỏ bên trái
-                left_box = s.shapes.add_shape(1, Inches(0), Inches(0),
-                                              Inches(7.7), Inches(7.5))
+                left_box = s.shapes.add_shape(1, Inches(0), Inches(0), Inches(7.7), Inches(7.5))
                 left_box.fill.solid()
                 left_box.fill.fore_color.rgb = DARK_RED
                 left_box.line.fill.background()
 
-                # Ảnh trang trại gió bên phải
                 if os.path.exists(BG_PATH):
                     s.shapes.add_picture(BG_PATH, Inches(7.7), Inches(0),
                                          width=Inches(5.633), height=Inches(7.5))
-
-                # Logo
                 if os.path.exists(LOGO_PATH):
-                    s.shapes.add_picture(LOGO_PATH, Inches(0.35), Inches(0.3),
-                                         height=Inches(0.7))
+                    s.shapes.add_picture(LOGO_PATH, Inches(0.35), Inches(0.3), height=Inches(0.7))
 
-                # Tiêu đề
-                tb = s.shapes.add_textbox(Inches(0.5), Inches(2.0),
-                                          Inches(7.0), Inches(2.2))
+                tb = s.shapes.add_textbox(Inches(0.5), Inches(2.0), Inches(7.0), Inches(2.2))
                 tf = tb.text_frame
                 tf.word_wrap = True
                 p = tf.paragraphs[0]
                 r = p.add_run()
                 r.text = "ĐÀO TẠO PHÒNG\nCHÁY CHỮA CHÁY"
-                r.font.size = Pt(44)
-                r.font.bold = True
-                r.font.color.rgb = WHITE
+                r.font.size = Pt(44); r.font.bold = True; r.font.color.rgb = WHITE
 
-                # Subtitle
-                tb2 = s.shapes.add_textbox(Inches(0.5), Inches(4.0),
-                                           Inches(7.0), Inches(1.0))
-                tf2 = tb2.text_frame
-                tf2.word_wrap = True
-                p2 = tf2.paragraphs[0]
-                r2 = p2.add_run()
+                tb2 = s.shapes.add_textbox(Inches(0.5), Inches(4.0), Inches(7.0), Inches(1.0))
+                tf2 = tb2.text_frame; tf2.word_wrap = True
+                p2 = tf2.paragraphs[0]; r2 = p2.add_run()
                 r2.text = "NHÀ MÁY ĐIỆN GIÓ YANG TRUNG – CHƠ LONG"
-                r2.font.size = Pt(20)
-                r2.font.bold = True
-                r2.font.color.rgb = YELLOW
+                r2.font.size = Pt(20); r2.font.bold = True; r2.font.color.rgb = YELLOW
 
-                # Thông tin
-                tb3 = s.shapes.add_textbox(Inches(0.5), Inches(5.2),
-                                           Inches(7.0), Inches(2.0))
-                tf3 = tb3.text_frame
-                tf3.word_wrap = True
+                tb3 = s.shapes.add_textbox(Inches(0.5), Inches(5.2), Inches(7.0), Inches(2.0))
+                tf3 = tb3.text_frame; tf3.word_wrap = True
                 info_lines = [
                     "CÔNG TY TNHH DỊCH VỤ VÀ KỸ THUẬT NĂNG LƯỢNG PECC2",
                     "TRUNG TÂM QUẢN LÝ VẬN HÀNH NHÀ MÁY ĐIỆN",
-                    "",
-                    "Người trình bày: Trương Hoàng An",
-                    "Mã quy trình: CLWP-QT-07",
+                    "", "Người trình bày: Trương Hoàng An", "Mã quy trình: CLWP-QT-07",
                 ]
                 for i, line in enumerate(info_lines):
-                    if i == 0:
-                        p3 = tf3.paragraphs[0]
-                    else:
-                        p3 = tf3.add_paragraph()
-                    r3 = p3.add_run()
-                    r3.text = line
-                    r3.font.size = Pt(12)
+                    p3 = tf3.paragraphs[0] if i == 0 else tf3.add_paragraph()
+                    r3 = p3.add_run(); r3.text = line; r3.font.size = Pt(12)
                     r3.font.color.rgb = WHITE if "Người" in line or "Mã" in line else RGBColor(0xDD, 0xDD, 0xDD)
 
-            # ==================== SECTION ====================
             elif stype == "section":
-                bg = s.shapes.add_shape(1, Inches(0), Inches(0),
-                                        Inches(13.333), Inches(7.5))
-                bg.fill.solid()
-                bg.fill.fore_color.rgb = DARK_RED
-                bg.line.fill.background()
-
-                tb = s.shapes.add_textbox(Inches(1), Inches(2.5),
-                                          Inches(11.333), Inches(1.5))
-                tf = tb.text_frame
-                tf.word_wrap = True
-                p = tf.paragraphs[0]
-                p.alignment = PP_ALIGN.CENTER
-                r = p.add_run()
-                r.text = slide['title']
-                r.font.size = Pt(48)
-                r.font.bold = True
-                r.font.color.rgb = WHITE
-
-                tb2 = s.shapes.add_textbox(Inches(1), Inches(4.0),
-                                           Inches(11.333), Inches(1.5))
-                tf2 = tb2.text_frame
-                tf2.word_wrap = True
-                p2 = tf2.paragraphs[0]
-                p2.alignment = PP_ALIGN.CENTER
-                r2 = p2.add_run()
-                r2.text = slide.get('subtitle', '')
-                r2.font.size = Pt(24)
-                r2.font.color.rgb = WHITE
-
+                bg = s.shapes.add_shape(1, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
+                bg.fill.solid(); bg.fill.fore_color.rgb = DARK_RED; bg.line.fill.background()
+                tb = s.shapes.add_textbox(Inches(1), Inches(2.5), Inches(11.333), Inches(1.5))
+                tf = tb.text_frame; p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER
+                r = p.add_run(); r.text = slide['title']
+                r.font.size = Pt(48); r.font.bold = True; r.font.color.rgb = WHITE
+                tb2 = s.shapes.add_textbox(Inches(1), Inches(4.0), Inches(11.333), Inches(1.5))
+                tf2 = tb2.text_frame; p2 = tf2.paragraphs[0]; p2.alignment = PP_ALIGN.CENTER
+                r2 = p2.add_run(); r2.text = slide.get('subtitle', '')
+                r2.font.size = Pt(24); r2.font.color.rgb = WHITE
                 if slide.get('lines'):
-                    tb3 = s.shapes.add_textbox(Inches(1.5), Inches(5.3),
-                                               Inches(10.333), Inches(1.5))
-                    tf3 = tb3.text_frame
-                    tf3.word_wrap = True
-                    p3 = tf3.paragraphs[0]
-                    p3.alignment = PP_ALIGN.CENTER
-                    r3 = p3.add_run()
-                    r3.text = ' '.join(slide.get('lines', []))
-                    r3.font.size = Pt(14)
-                    r3.font.color.rgb = RGBColor(0xEE, 0xEE, 0xEE)
+                    tb3 = s.shapes.add_textbox(Inches(1.5), Inches(5.3), Inches(10.333), Inches(1.5))
+                    tf3 = tb3.text_frame; p3 = tf3.paragraphs[0]; p3.alignment = PP_ALIGN.CENTER
+                    r3 = p3.add_run(); r3.text = ' '.join(slide.get('lines', []))
+                    r3.font.size = Pt(14); r3.font.color.rgb = RGBColor(0xEE, 0xEE, 0xEE)
 
-            # ==================== CLOSING ====================
             elif stype == "closing":
-                bg = s.shapes.add_shape(1, Inches(0), Inches(0),
-                                        Inches(13.333), Inches(7.5))
-                bg.fill.solid()
-                bg.fill.fore_color.rgb = RED
-                bg.line.fill.background()
-
-                tb = s.shapes.add_textbox(Inches(1), Inches(2.5),
-                                          Inches(11.333), Inches(1.5))
-                tf = tb.text_frame
-                p = tf.paragraphs[0]
-                p.alignment = PP_ALIGN.CENTER
-                r = p.add_run()
-                r.text = slide['title']
-                r.font.size = Pt(48)
-                r.font.bold = True
-                r.font.color.rgb = WHITE
-
-                tb2 = s.shapes.add_textbox(Inches(1), Inches(4.0),
-                                           Inches(11.333), Inches(1))
-                tf2 = tb2.text_frame
-                p2 = tf2.paragraphs[0]
-                p2.alignment = PP_ALIGN.CENTER
-                r2 = p2.add_run()
-                r2.text = slide.get('subtitle', '')
-                r2.font.size = Pt(28)
-                r2.font.color.rgb = WHITE
-
-                tb3 = s.shapes.add_textbox(Inches(1), Inches(5.3),
-                                           Inches(11.333), Inches(1.5))
-                tf3 = tb3.text_frame
-                tf3.word_wrap = True
+                bg = s.shapes.add_shape(1, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
+                bg.fill.solid(); bg.fill.fore_color.rgb = RED; bg.line.fill.background()
+                tb = s.shapes.add_textbox(Inches(1), Inches(2.5), Inches(11.333), Inches(1.5))
+                tf = tb.text_frame; p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER
+                r = p.add_run(); r.text = slide['title']
+                r.font.size = Pt(48); r.font.bold = True; r.font.color.rgb = WHITE
+                tb2 = s.shapes.add_textbox(Inches(1), Inches(4.0), Inches(11.333), Inches(1))
+                tf2 = tb2.text_frame; p2 = tf2.paragraphs[0]; p2.alignment = PP_ALIGN.CENTER
+                r2 = p2.add_run(); r2.text = slide.get('subtitle', '')
+                r2.font.size = Pt(28); r2.font.color.rgb = WHITE
+                tb3 = s.shapes.add_textbox(Inches(1), Inches(5.3), Inches(11.333), Inches(1.5))
+                tf3 = tb3.text_frame; tf3.word_wrap = True
                 for i, line in enumerate(slide.get('lines', [])):
                     p3 = tf3.paragraphs[0] if i == 0 else tf3.add_paragraph()
                     p3.alignment = PP_ALIGN.CENTER
-                    r3 = p3.add_run()
-                    r3.text = line
-                    r3.font.size = Pt(14)
-                    r3.font.color.rgb = RGBColor(0xEE, 0xEE, 0xEE)
+                    r3 = p3.add_run(); r3.text = line
+                    r3.font.size = Pt(14); r3.font.color.rgb = RGBColor(0xEE, 0xEE, 0xEE)
 
-            # ==================== CÁC SLIDE KHÁC ====================
             else:
-                # Header đỏ
-                hdr = s.shapes.add_shape(1, Inches(0), Inches(0),
-                                         Inches(13.333), Inches(0.9))
-                hdr.fill.solid()
-                hdr.fill.fore_color.rgb = RED
-                hdr.line.fill.background()
+                # Header trắng + viền navy
+                hdr = s.shapes.add_shape(1, Inches(0), Inches(0), Inches(13.333), Inches(0.95))
+                hdr.fill.solid(); hdr.fill.fore_color.rgb = WHITE
+                hdr.line.color.rgb = NAVY; hdr.line.width = Pt(2)
 
-                # Logo trong header
                 if os.path.exists(LOGO_PATH):
-                    s.shapes.add_picture(LOGO_PATH, Inches(0.2), Inches(0.15),
-                                         height=Inches(0.6))
+                    s.shapes.add_picture(LOGO_PATH, Inches(0.2), Inches(0.2), height=Inches(0.55))
 
-                # Tên công ty trong header
-                tb_hdr = s.shapes.add_textbox(Inches(1.3), Inches(0.15),
-                                              Inches(11.0), Inches(0.6))
-                tf_hdr = tb_hdr.text_frame
-                tf_hdr.word_wrap = True
-                p_hdr = tf_hdr.paragraphs[0]
-                r_hdr = p_hdr.add_run()
-                r_hdr.text = "CÔNG TY TNHH DV & KT NĂNG LƯỢNG PECC2  |  TRUNG TÂM QLVH NHÀ MÁY ĐIỆN"
-                r_hdr.font.size = Pt(10)
-                r_hdr.font.color.rgb = WHITE
+                tb_hdr = s.shapes.add_textbox(Inches(1.8), Inches(0.1), Inches(11.0), Inches(0.75))
+                tf_hdr = tb_hdr.text_frame; tf_hdr.word_wrap = True
+                p_h = tf_hdr.paragraphs[0]; p_h.alignment = PP_ALIGN.CENTER
+                r_h = p_h.add_run(); r_h.text = "CÔNG TY TNHH DỊCH VỤ VÀ KỸ THUẬT NĂNG LƯỢNG PECC2"
+                r_h.font.size = Pt(14); r_h.font.bold = True; r_h.font.color.rgb = NAVY
+                p_h2 = tf_hdr.add_paragraph(); p_h2.alignment = PP_ALIGN.CENTER
+                r_h2 = p_h2.add_run(); r_h2.text = "TRUNG TÂM QUẢN LÝ VẬN HÀNH NHÀ MÁY ĐIỆN"
+                r_h2.font.size = Pt(12); r_h2.font.bold = True; r_h2.font.color.rgb = RED
 
-                # Số slide
-                tb_no = s.shapes.add_textbox(Inches(12.3), Inches(0.3),
-                                             Inches(1.0), Inches(0.4))
-                tf_no = tb_no.text_frame
-                p_no = tf_no.paragraphs[0]
-                p_no.alignment = PP_ALIGN.RIGHT
-                r_no = p_no.add_run()
-                r_no.text = f"{SLIDES.index(slide) + 1} / {len(SLIDES)}"
-                r_no.font.size = Pt(10)
-                r_no.font.color.rgb = RGBColor(0xDD, 0xDD, 0xDD)
-
-                # Tiêu đề slide
-                tb_title = s.shapes.add_textbox(Inches(0.5), Inches(1.05),
-                                                Inches(12.333), Inches(0.7))
-                tf_title = tb_title.text_frame
-                tf_title.word_wrap = True
-                p_title = tf_title.paragraphs[0]
-                r_title = p_title.add_run()
-                r_title.text = slide.get('title', '')
-                r_title.font.size = Pt(22)
-                r_title.font.bold = True
-                r_title.font.color.rgb = RED
+                # Tiêu đề slide: nền đỏ, chữ trắng
+                title_bg = s.shapes.add_shape(1, Inches(0.4), Inches(1.05), Inches(12.533), Inches(0.55))
+                title_bg.fill.solid(); title_bg.fill.fore_color.rgb = RED
+                title_bg.line.fill.background()
+                tb_title = s.shapes.add_textbox(Inches(0.5), Inches(1.08), Inches(12.4), Inches(0.5))
+                tf_t = tb_title.text_frame
+                p_t = tf_t.paragraphs[0]
+                r_t = p_t.add_run(); r_t.text = slide.get('title', '')
+                r_t.font.size = Pt(18); r_t.font.bold = True; r_t.font.color.rgb = WHITE
 
                 # Nội dung
-                tb_content = s.shapes.add_textbox(Inches(0.5), Inches(1.85),
-                                                  Inches(12.333), Inches(5.3))
-                tf_content = tb_content.text_frame
-                tf_content.word_wrap = True
+                tb_content = s.shapes.add_textbox(Inches(0.5), Inches(1.85), Inches(12.333), Inches(5.3))
+                tf_content = tb_content.text_frame; tf_content.word_wrap = True
 
                 def add_line(text, bold=False, size=14, color=BLACK):
                     if len(tf_content.paragraphs) == 1 and tf_content.paragraphs[0].text == "":
                         p = tf_content.paragraphs[0]
                     else:
                         p = tf_content.add_paragraph()
-                    r = p.add_run()
-                    r.text = str(text)
-                    r.font.size = Pt(size)
-                    r.font.bold = bold
-                    r.font.color.rgb = color
-                    return p
+                    r = p.add_run(); r.text = str(text)
+                    r.font.size = Pt(size); r.font.bold = bold; r.font.color.rgb = color
 
                 if stype == "toc":
                     for badge, title, desc in slide["items"]:
                         add_line(f"▸ {badge}. {title}", bold=True, size=16, color=RED)
                         add_line(f"     {desc}", size=12, color=GRAY)
-
                 elif stype == "cards":
                     for icon, title, desc in slide["items"]:
                         add_line(f"{icon} {title}", bold=True, size=15, color=RED)
-                        if desc:
-                            add_line(f"     {desc}", size=12, color=GRAY)
-
+                        if desc: add_line(f"     {desc}", size=12, color=GRAY)
                 elif stype == "list":
                     for line in slide["lines"]:
-                        clean = line.replace("**", "")
-                        add_line(f"▸ {clean}", size=13)
-
+                        add_line(f"▸ {line.replace('**','')}", size=13)
                 elif stype == "table":
-                    headers = slide["headers"]
-                    add_line(" | ".join(headers), bold=True, size=12, color=WHITE)
+                    add_line(" | ".join(slide["headers"]), bold=True, size=12, color=WHITE)
                     for row in slide["rows"]:
                         add_line(" | ".join(str(x) for x in row), size=11)
-
                 elif stype == "two-col":
                     add_line(slide.get("left_title", ""), bold=True, size=15, color=RED)
-                    for l in slide.get("left_lines", []):
-                        add_line(f"  • {l}", size=12)
+                    for l in slide.get("left_lines", []): add_line(f"  • {l}", size=12)
                     add_line("", size=8)
                     add_line(slide.get("right_title", ""), bold=True, size=15, color=RED)
-                    for l in slide.get("right_lines", []):
-                        add_line(f"  • {l}", size=12)
+                    for l in slide.get("right_lines", []): add_line(f"  • {l}", size=12)
                     if slide.get("note"):
                         add_line("", size=8)
                         add_line(slide["note"].replace("**", ""), size=12, color=RED)
-
                 elif stype == "flow":
                     for row in slide["rows"]:
                         add_line("  →  ".join([b for b in row if b]), size=14, bold=True, color=RED)
-
                 elif stype == "kpi":
-                    add_line(" | ".join([f"{v} ({l})" for v, l in slide["kpis"]]),
-                             size=18, bold=True, color=RED)
+                    add_line(" | ".join([f"{v} ({l})" for v, l in slide["kpis"]]), size=18, bold=True, color=RED)
                     if slide.get("note"):
-                        add_line("", size=8)
-                        add_line(slide["note"], size=12)
-
+                        add_line("", size=8); add_line(slide["note"], size=12)
                 elif stype == "pass":
                     for letter, name, desc in slide["items"]:
                         add_line(f"{letter} – {name}: {desc}", size=15, bold=True, color=RED)
 
-        # Lưu vào buffer
         buf = io.BytesIO()
         prs.save(buf)
         buf.seek(0)
         return buf.getvalue()
-
     except ImportError:
         return None
 
@@ -1050,7 +950,6 @@ render_slide(SLIDES[st.session_state.slide_idx], st.session_state.slide_idx + 1,
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# ===================== HÀNG NÚT ĐIỀU HƯỚNG =====================
 nav1, nav2, nav3, nav4 = st.columns([1, 2.5, 1, 1.5])
 
 with nav1:
@@ -1072,7 +971,6 @@ with nav3:
         st.rerun()
 
 with nav4:
-    # Nút tải PPTX
     if st.button("📥 Tải PPTX", key="dl_btn", use_container_width=True):
         with st.spinner("Đang tạo file PPTX..."):
             pptx_bytes = build_pptx()
@@ -1081,7 +979,6 @@ with nav4:
             else:
                 st.error("Cần cài `python-pptx`: thêm `python-pptx` vào requirements.txt")
 
-# Nút download (ẩn dưới dạng download_button để trình duyệt tải file)
 if "pptx_data" in st.session_state and st.session_state["pptx_data"]:
     st.download_button(
         label="⬇️ Nhấn để tải file PPTX",
@@ -1091,7 +988,6 @@ if "pptx_data" in st.session_state and st.session_state["pptx_data"]:
         use_container_width=True,
     )
 
-# ===================== CHỌN SLIDE NHANH =====================
 with st.expander("🔍 Chuyển nhanh đến slide"):
     options = [f"{i+1}. {s.get('title', s.get('subtitle',''))}" for i, s in enumerate(SLIDES)]
     sel = st.selectbox("Chọn slide", options, index=st.session_state.slide_idx,
