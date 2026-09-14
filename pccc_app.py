@@ -2,7 +2,10 @@ import streamlit as st
 from PIL import Image
 import os
 import base64
+import io
+from datetime import datetime
 
+# ===================== CẤU HÌNH =====================
 st.set_page_config(
     page_title="Đào tạo PCCC - Nhà máy Điện gió Yang Trung",
     page_icon="🔥",
@@ -10,7 +13,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ===================== ĐƯỜNG DẪN ẢNH =====================
 LOGO_PATH = "images/Horizontal_logo_pese_1.png"
 BG_PATH = "images/trang_trai_gio.jpg"
 
@@ -37,22 +39,22 @@ st.markdown("""
     .main { background: #ffffff; }
     .block-container { padding: 0.5rem 1.5rem 2rem 1.5rem; max-width: 1400px; }
 
-    /* ================= HEADER ================= */
+    /* ================= HEADER (dùng inline-block, KHÔNG table) ================= */
     .header-bar {
         background: linear-gradient(135deg, #cc0000, #990000);
         color: #fff;
         padding: 10px 22px;
         border-radius: 6px;
         margin-bottom: 0;
-        display: table;
-        width: 100%;
-        table-layout: fixed;
-        box-sizing: border-box;
+        overflow: hidden;
+        line-height: 1.35;
+        font-size: 0;              /* xoá khoảng trắng giữa inline-block */
     }
     .header-bar .hdr-left {
-        display: table-cell;
+        display: inline-block;
         vertical-align: middle;
         width: 55px;
+        font-size: 14px;
     }
     .header-bar .hdr-logo {
         height: 34px;
@@ -60,51 +62,50 @@ st.markdown("""
         display: block;
     }
     .header-bar .hdr-mid {
-        display: table-cell;
+        display: inline-block;
         vertical-align: middle;
         padding-left: 12px;
-        line-height: 1.35;
-    }
-    .header-bar .company {
+        width: calc(100% - 130px);
         font-size: 10px;
         color: rgba(255,255,255,.92);
         letter-spacing: .3px;
+        line-height: 1.4;
     }
     .header-bar .hdr-right {
-        display: table-cell;
+        display: inline-block;
         vertical-align: middle;
         text-align: right;
-        width: 70px;
+        width: 60px;
         font-size: 11px;
-        color: rgba(255,255,255,.7);
+        color: rgba(255,255,255,.75);
     }
     .header-title {
         color: #CC0000;
         font-size: 17px;
         font-weight: 700;
         margin: 10px 0 14px 0;
-        padding: 0;
         display: block;
     }
 
     /* ================= COVER ================= */
     .cover-wrapper {
-        display: table;
-        width: 100%;
         border-radius: 10px;
         overflow: hidden;
         min-height: 620px;
         box-shadow: 0 10px 40px rgba(0,0,0,.3);
-        table-layout: fixed;
+        font-size: 0;              /* xoá khoảng trắng inline-block */
     }
     .cover-left {
-        display: table-cell;
+        display: inline-block;
+        vertical-align: top;
         width: 58%;
         background: linear-gradient(135deg, #8B0000 0%, #A00000 50%, #C00000 100%);
         color: #fff;
         padding: 40px 45px;
-        vertical-align: middle;
+        box-sizing: border-box;
+        min-height: 620px;
         position: relative;
+        font-size: 14px;
     }
     .cover-left .logo {
         position: absolute;
@@ -161,15 +162,17 @@ st.markdown("""
         color: #fff;
         line-height: 2;
     }
-    .cover-left .info strong { font-weight: 700; }
     .cover-right {
-        display: table-cell;
+        display: inline-block;
+        vertical-align: top;
         width: 42%;
+        min-height: 620px;
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+        box-sizing: border-box;
         position: relative;
-        vertical-align: middle;
+        font-size: 14px;
     }
     .cover-right::after {
         content: '';
@@ -212,13 +215,7 @@ st.markdown("""
         margin-bottom: 10px;
         font-size: 14px;
         color: #333;
-        transition: all .3s;
     }
-    .card:hover {
-        box-shadow: 0 4px 12px rgba(204,0,0,.15);
-        transform: translateY(-2px);
-    }
-
     .kpi {
         background: #F5F5F5;
         border-left: 4px solid #CC0000;
@@ -261,28 +258,10 @@ st.markdown("""
         color: #333;
     }
     .flow-box.act { background: #CC0000; color: #fff; }
-    .arrow { text-align: center; color: #CC0000; font-size: 22px; font-weight: 700; }
 
-    /* Dots điều hướng */
-    .dots-wrap {
-        display: flex;
-        justify-content: center;
-        gap: 6px;
-        padding: 12px 0 4px 0;
-        flex-wrap: wrap;
-    }
-    .dot {
-        width: 9px; height: 9px;
-        border-radius: 50%;
-        background: rgba(204,0,0,.25);
-        display: inline-block;
-        transition: all .3s;
-    }
-    .dot.active {
-        background: #CC0000;
-        transform: scale(1.4);
-        box-shadow: 0 0 8px rgba(204,0,0,.5);
-    }
+    .dots-wrap { display: flex; justify-content: center; gap: 6px; padding: 12px 0 4px 0; flex-wrap: wrap; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(204,0,0,.25); display: inline-block; }
+    .dot.active { background: #CC0000; transform: scale(1.4); box-shadow: 0 0 8px rgba(204,0,0,.5); }
 </style>
 """, unsafe_allow_html=True)
 
@@ -454,11 +433,7 @@ SLIDES = [
         "4. Xem trạng thái **LOOP**",
      ],
      "right_title": "Trạng thái hiển thị",
-     "right_lines": [
-        "✅ Bình thường",
-        "⚠️ Sự cố (Trouble)",
-        "🔥 Báo cháy – FIRE",
-     ]},
+     "right_lines": ["✅ Bình thường", "⚠️ Sự cố (Trouble)", "🔥 Báo cháy – FIRE"]},
     {"type": "table", "title": "CÁC NÚT NHẤN TRÊN TỦ BÁO CHÁY",
      "headers": ["Nút", "Chức năng", "Trạng thái"],
      "rows": [
@@ -503,10 +478,8 @@ SLIDES = [
      ]},
     {"type": "cards", "title": "THIẾT BỊ PHỤ TRỢ CHỮA CHÁY", "cols": 4,
      "items": [
-        ("🔌", "Họng DN65", ""),
-        ("🧰", "Tủ chữa cháy", ""),
-        ("🔧", "Cuộn vòi", ""),
-        ("💨", "HV14/STV-NZ", ""),
+        ("🔌", "Họng DN65", ""), ("🧰", "Tủ chữa cháy", ""),
+        ("🔧", "Cuộn vòi", ""), ("💨", "HV14/STV-NZ", ""),
      ]},
     {"type": "section", "title": "PHẦN C",
      "subtitle": "QUY TRÌNH KIỂM TRA, VẬN HÀNH & BẢO TRÌ",
@@ -600,18 +573,13 @@ SLIDES = [
 ]
 
 
-# ===================== RENDER HEADER =====================
+# ===================== RENDER HEADER (dùng inline-block, KHÔNG table) =====================
 def render_header(idx, total):
-    """Chỉ render header (logo + tên công ty + số slide). KHÔNG chứa tiêu đề."""
     logo_b64 = img_to_base64(LOGO_PATH)
     logo_html = f'<img class="hdr-logo" src="data:image/png;base64,{logo_b64}">' if logo_b64 else ''
     st.markdown(f"""
     <div class="header-bar">
-        <div class="hdr-left">{logo_html}</div>
-        <div class="hdr-mid">
-            <div class="company">CÔNG TY TNHH DV &amp; KT NĂNG LƯỢNG PECC2 &nbsp;|&nbsp; TRUNG TÂM QLVH NHÀ MÁY ĐIỆN</div>
-        </div>
-        <div class="hdr-right">{idx} / {total}</div>
+        <span class="hdr-left">{logo_html}</span><span class="hdr-mid">CÔNG TY TNHH DV &amp; KT NĂNG LƯỢNG PECC2 &nbsp;|&nbsp; TRUNG TÂM QLVH NHÀ MÁY ĐIỆN</span><span class="hdr-right">{idx} / {total}</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -620,7 +588,6 @@ def render_header(idx, total):
 def render_slide(slide, idx, total):
     stype = slide.get("type", "content")
 
-    # -------- COVER --------
     if stype == "cover":
         logo_b64 = img_to_base64(LOGO_PATH)
         bg_b64 = img_to_base64(BG_PATH)
@@ -641,13 +608,11 @@ def render_slide(slide, idx, total):
                     <strong>Người trình bày:</strong> Trương Hoàng An<br>
                     <strong>Mã quy trình:</strong> CLWP-QT-07
                 </div>
-            </div>
-            <div class="cover-right" style="{bg_style}"></div>
+            </div><div class="cover-right" style="{bg_style}"></div>
         </div>
         """, unsafe_allow_html=True)
         return
 
-    # -------- SECTION --------
     if stype == "section":
         st.markdown(f"""
         <div class="section">
@@ -658,7 +623,6 @@ def render_slide(slide, idx, total):
         """, unsafe_allow_html=True)
         return
 
-    # -------- CLOSING --------
     if stype == "closing":
         st.markdown(f"""
         <div class="closing">
@@ -670,13 +634,11 @@ def render_slide(slide, idx, total):
         """, unsafe_allow_html=True)
         return
 
-    # -------- HEADER cho các slide còn lại --------
+    # Header + Title cho các slide khác
     render_header(idx, total)
-    # Tiêu đề tách riêng, nằm dưới header
     st.markdown(f'<div class="header-title">📑 {slide.get("title", "")}</div>',
                 unsafe_allow_html=True)
 
-    # -------- TOC --------
     if stype == "toc":
         cols = st.columns(2)
         colors = [("#CC0000", "linear-gradient(145deg,#fff5f5,#fff)"),
@@ -697,7 +659,6 @@ def render_slide(slide, idx, total):
                 """, unsafe_allow_html=True)
         return
 
-    # -------- CARDS --------
     if stype == "cards":
         cols_n = slide.get("cols", 3)
         cols = st.columns(cols_n)
@@ -713,13 +674,11 @@ def render_slide(slide, idx, total):
                 """, unsafe_allow_html=True)
         return
 
-    # -------- LIST --------
     if stype == "list":
         html = "<ul class='cl'>" + "".join([f"<li>{l}</li>" for l in slide["lines"]]) + "</ul>"
         st.markdown(html, unsafe_allow_html=True)
         return
 
-    # -------- TABLE --------
     if stype == "table":
         headers = slide["headers"]
         rows = slide["rows"]
@@ -730,7 +689,6 @@ def render_slide(slide, idx, total):
         st.markdown(table_md)
         return
 
-    # -------- TWO COL --------
     if stype == "two-col":
         c1, c2 = st.columns(2)
         with c1:
@@ -743,7 +701,6 @@ def render_slide(slide, idx, total):
             st.info(slide["note"])
         return
 
-    # -------- FLOW --------
     if stype == "flow":
         for row in slide["rows"]:
             cols = st.columns(len(row) * 2 - 1)
@@ -756,7 +713,6 @@ def render_slide(slide, idx, total):
                         st.markdown("<div class='arrow'>→</div>", unsafe_allow_html=True)
         return
 
-    # -------- KPI --------
     if stype == "kpi":
         cols = st.columns(len(slide["kpis"]))
         for i, (v, l) in enumerate(slide["kpis"]):
@@ -771,7 +727,6 @@ def render_slide(slide, idx, total):
             st.info(slide["note"])
         return
 
-    # -------- PASS --------
     if stype == "pass":
         cols = st.columns(4)
         for i, (letter, name, desc) in enumerate(slide["items"]):
@@ -786,19 +741,317 @@ def render_slide(slide, idx, total):
         return
 
 
+# ===================== TẠO PPTX =====================
+def build_pptx():
+    """Tạo file PPTX từ dữ liệu SLIDES"""
+    try:
+        from pptx import Presentation
+        from pptx.util import Inches, Pt
+        from pptx.dml.color import RGBColor
+        from pptx.enum.text import PP_ALIGN
+
+        prs = Presentation()
+        prs.slide_width = Inches(13.333)
+        prs.slide_height = Inches(7.5)
+        blank = prs.slide_layouts[6]
+
+        RED = RGBColor(0xCC, 0x00, 0x00)
+        DARK_RED = RGBColor(0x80, 0x00, 0x00)
+        YELLOW = RGBColor(0xFF, 0xD7, 0x00)
+        WHITE = RGBColor(0xFF, 0xFF, 0xFF)
+        BLACK = RGBColor(0x22, 0x22, 0x22)
+        GRAY = RGBColor(0x66, 0x66, 0x66)
+
+        for slide in SLIDES:
+            stype = slide.get("type", "content")
+            s = prs.slides.add_slide(blank)
+
+            # ==================== COVER ====================
+            if stype == "cover":
+                # Nền đỏ bên trái
+                left_box = s.shapes.add_shape(1, Inches(0), Inches(0),
+                                              Inches(7.7), Inches(7.5))
+                left_box.fill.solid()
+                left_box.fill.fore_color.rgb = DARK_RED
+                left_box.line.fill.background()
+
+                # Ảnh trang trại gió bên phải
+                if os.path.exists(BG_PATH):
+                    s.shapes.add_picture(BG_PATH, Inches(7.7), Inches(0),
+                                         width=Inches(5.633), height=Inches(7.5))
+
+                # Logo
+                if os.path.exists(LOGO_PATH):
+                    s.shapes.add_picture(LOGO_PATH, Inches(0.35), Inches(0.3),
+                                         height=Inches(0.7))
+
+                # Tiêu đề
+                tb = s.shapes.add_textbox(Inches(0.5), Inches(2.0),
+                                          Inches(7.0), Inches(2.2))
+                tf = tb.text_frame
+                tf.word_wrap = True
+                p = tf.paragraphs[0]
+                r = p.add_run()
+                r.text = "ĐÀO TẠO PHÒNG\nCHÁY CHỮA CHÁY"
+                r.font.size = Pt(44)
+                r.font.bold = True
+                r.font.color.rgb = WHITE
+
+                # Subtitle
+                tb2 = s.shapes.add_textbox(Inches(0.5), Inches(4.0),
+                                           Inches(7.0), Inches(1.0))
+                tf2 = tb2.text_frame
+                tf2.word_wrap = True
+                p2 = tf2.paragraphs[0]
+                r2 = p2.add_run()
+                r2.text = "NHÀ MÁY ĐIỆN GIÓ YANG TRUNG – CHƠ LONG"
+                r2.font.size = Pt(20)
+                r2.font.bold = True
+                r2.font.color.rgb = YELLOW
+
+                # Thông tin
+                tb3 = s.shapes.add_textbox(Inches(0.5), Inches(5.2),
+                                           Inches(7.0), Inches(2.0))
+                tf3 = tb3.text_frame
+                tf3.word_wrap = True
+                info_lines = [
+                    "CÔNG TY TNHH DỊCH VỤ VÀ KỸ THUẬT NĂNG LƯỢNG PECC2",
+                    "TRUNG TÂM QUẢN LÝ VẬN HÀNH NHÀ MÁY ĐIỆN",
+                    "",
+                    "Người trình bày: Trương Hoàng An",
+                    "Mã quy trình: CLWP-QT-07",
+                ]
+                for i, line in enumerate(info_lines):
+                    if i == 0:
+                        p3 = tf3.paragraphs[0]
+                    else:
+                        p3 = tf3.add_paragraph()
+                    r3 = p3.add_run()
+                    r3.text = line
+                    r3.font.size = Pt(12)
+                    r3.font.color.rgb = WHITE if "Người" in line or "Mã" in line else RGBColor(0xDD, 0xDD, 0xDD)
+
+            # ==================== SECTION ====================
+            elif stype == "section":
+                bg = s.shapes.add_shape(1, Inches(0), Inches(0),
+                                        Inches(13.333), Inches(7.5))
+                bg.fill.solid()
+                bg.fill.fore_color.rgb = DARK_RED
+                bg.line.fill.background()
+
+                tb = s.shapes.add_textbox(Inches(1), Inches(2.5),
+                                          Inches(11.333), Inches(1.5))
+                tf = tb.text_frame
+                tf.word_wrap = True
+                p = tf.paragraphs[0]
+                p.alignment = PP_ALIGN.CENTER
+                r = p.add_run()
+                r.text = slide['title']
+                r.font.size = Pt(48)
+                r.font.bold = True
+                r.font.color.rgb = WHITE
+
+                tb2 = s.shapes.add_textbox(Inches(1), Inches(4.0),
+                                           Inches(11.333), Inches(1.5))
+                tf2 = tb2.text_frame
+                tf2.word_wrap = True
+                p2 = tf2.paragraphs[0]
+                p2.alignment = PP_ALIGN.CENTER
+                r2 = p2.add_run()
+                r2.text = slide.get('subtitle', '')
+                r2.font.size = Pt(24)
+                r2.font.color.rgb = WHITE
+
+                if slide.get('lines'):
+                    tb3 = s.shapes.add_textbox(Inches(1.5), Inches(5.3),
+                                               Inches(10.333), Inches(1.5))
+                    tf3 = tb3.text_frame
+                    tf3.word_wrap = True
+                    p3 = tf3.paragraphs[0]
+                    p3.alignment = PP_ALIGN.CENTER
+                    r3 = p3.add_run()
+                    r3.text = ' '.join(slide.get('lines', []))
+                    r3.font.size = Pt(14)
+                    r3.font.color.rgb = RGBColor(0xEE, 0xEE, 0xEE)
+
+            # ==================== CLOSING ====================
+            elif stype == "closing":
+                bg = s.shapes.add_shape(1, Inches(0), Inches(0),
+                                        Inches(13.333), Inches(7.5))
+                bg.fill.solid()
+                bg.fill.fore_color.rgb = RED
+                bg.line.fill.background()
+
+                tb = s.shapes.add_textbox(Inches(1), Inches(2.5),
+                                          Inches(11.333), Inches(1.5))
+                tf = tb.text_frame
+                p = tf.paragraphs[0]
+                p.alignment = PP_ALIGN.CENTER
+                r = p.add_run()
+                r.text = slide['title']
+                r.font.size = Pt(48)
+                r.font.bold = True
+                r.font.color.rgb = WHITE
+
+                tb2 = s.shapes.add_textbox(Inches(1), Inches(4.0),
+                                           Inches(11.333), Inches(1))
+                tf2 = tb2.text_frame
+                p2 = tf2.paragraphs[0]
+                p2.alignment = PP_ALIGN.CENTER
+                r2 = p2.add_run()
+                r2.text = slide.get('subtitle', '')
+                r2.font.size = Pt(28)
+                r2.font.color.rgb = WHITE
+
+                tb3 = s.shapes.add_textbox(Inches(1), Inches(5.3),
+                                           Inches(11.333), Inches(1.5))
+                tf3 = tb3.text_frame
+                tf3.word_wrap = True
+                for i, line in enumerate(slide.get('lines', [])):
+                    p3 = tf3.paragraphs[0] if i == 0 else tf3.add_paragraph()
+                    p3.alignment = PP_ALIGN.CENTER
+                    r3 = p3.add_run()
+                    r3.text = line
+                    r3.font.size = Pt(14)
+                    r3.font.color.rgb = RGBColor(0xEE, 0xEE, 0xEE)
+
+            # ==================== CÁC SLIDE KHÁC ====================
+            else:
+                # Header đỏ
+                hdr = s.shapes.add_shape(1, Inches(0), Inches(0),
+                                         Inches(13.333), Inches(0.9))
+                hdr.fill.solid()
+                hdr.fill.fore_color.rgb = RED
+                hdr.line.fill.background()
+
+                # Logo trong header
+                if os.path.exists(LOGO_PATH):
+                    s.shapes.add_picture(LOGO_PATH, Inches(0.2), Inches(0.15),
+                                         height=Inches(0.6))
+
+                # Tên công ty trong header
+                tb_hdr = s.shapes.add_textbox(Inches(1.3), Inches(0.15),
+                                              Inches(11.0), Inches(0.6))
+                tf_hdr = tb_hdr.text_frame
+                tf_hdr.word_wrap = True
+                p_hdr = tf_hdr.paragraphs[0]
+                r_hdr = p_hdr.add_run()
+                r_hdr.text = "CÔNG TY TNHH DV & KT NĂNG LƯỢNG PECC2  |  TRUNG TÂM QLVH NHÀ MÁY ĐIỆN"
+                r_hdr.font.size = Pt(10)
+                r_hdr.font.color.rgb = WHITE
+
+                # Số slide
+                tb_no = s.shapes.add_textbox(Inches(12.3), Inches(0.3),
+                                             Inches(1.0), Inches(0.4))
+                tf_no = tb_no.text_frame
+                p_no = tf_no.paragraphs[0]
+                p_no.alignment = PP_ALIGN.RIGHT
+                r_no = p_no.add_run()
+                r_no.text = f"{SLIDES.index(slide) + 1} / {len(SLIDES)}"
+                r_no.font.size = Pt(10)
+                r_no.font.color.rgb = RGBColor(0xDD, 0xDD, 0xDD)
+
+                # Tiêu đề slide
+                tb_title = s.shapes.add_textbox(Inches(0.5), Inches(1.05),
+                                                Inches(12.333), Inches(0.7))
+                tf_title = tb_title.text_frame
+                tf_title.word_wrap = True
+                p_title = tf_title.paragraphs[0]
+                r_title = p_title.add_run()
+                r_title.text = slide.get('title', '')
+                r_title.font.size = Pt(22)
+                r_title.font.bold = True
+                r_title.font.color.rgb = RED
+
+                # Nội dung
+                tb_content = s.shapes.add_textbox(Inches(0.5), Inches(1.85),
+                                                  Inches(12.333), Inches(5.3))
+                tf_content = tb_content.text_frame
+                tf_content.word_wrap = True
+
+                def add_line(text, bold=False, size=14, color=BLACK):
+                    if len(tf_content.paragraphs) == 1 and tf_content.paragraphs[0].text == "":
+                        p = tf_content.paragraphs[0]
+                    else:
+                        p = tf_content.add_paragraph()
+                    r = p.add_run()
+                    r.text = str(text)
+                    r.font.size = Pt(size)
+                    r.font.bold = bold
+                    r.font.color.rgb = color
+                    return p
+
+                if stype == "toc":
+                    for badge, title, desc in slide["items"]:
+                        add_line(f"▸ {badge}. {title}", bold=True, size=16, color=RED)
+                        add_line(f"     {desc}", size=12, color=GRAY)
+
+                elif stype == "cards":
+                    for icon, title, desc in slide["items"]:
+                        add_line(f"{icon} {title}", bold=True, size=15, color=RED)
+                        if desc:
+                            add_line(f"     {desc}", size=12, color=GRAY)
+
+                elif stype == "list":
+                    for line in slide["lines"]:
+                        clean = line.replace("**", "")
+                        add_line(f"▸ {clean}", size=13)
+
+                elif stype == "table":
+                    headers = slide["headers"]
+                    add_line(" | ".join(headers), bold=True, size=12, color=WHITE)
+                    for row in slide["rows"]:
+                        add_line(" | ".join(str(x) for x in row), size=11)
+
+                elif stype == "two-col":
+                    add_line(slide.get("left_title", ""), bold=True, size=15, color=RED)
+                    for l in slide.get("left_lines", []):
+                        add_line(f"  • {l}", size=12)
+                    add_line("", size=8)
+                    add_line(slide.get("right_title", ""), bold=True, size=15, color=RED)
+                    for l in slide.get("right_lines", []):
+                        add_line(f"  • {l}", size=12)
+                    if slide.get("note"):
+                        add_line("", size=8)
+                        add_line(slide["note"].replace("**", ""), size=12, color=RED)
+
+                elif stype == "flow":
+                    for row in slide["rows"]:
+                        add_line("  →  ".join([b for b in row if b]), size=14, bold=True, color=RED)
+
+                elif stype == "kpi":
+                    add_line(" | ".join([f"{v} ({l})" for v, l in slide["kpis"]]),
+                             size=18, bold=True, color=RED)
+                    if slide.get("note"):
+                        add_line("", size=8)
+                        add_line(slide["note"], size=12)
+
+                elif stype == "pass":
+                    for letter, name, desc in slide["items"]:
+                        add_line(f"{letter} – {name}: {desc}", size=15, bold=True, color=RED)
+
+        # Lưu vào buffer
+        buf = io.BytesIO()
+        prs.save(buf)
+        buf.seek(0)
+        return buf.getvalue()
+
+    except ImportError:
+        return None
+
+
 # ===================== ĐIỀU KHIỂN =====================
 if "slide_idx" not in st.session_state:
     st.session_state.slide_idx = 0
 
 TOTAL = len(SLIDES)
 
-# Render slide hiện tại
 render_slide(SLIDES[st.session_state.slide_idx], st.session_state.slide_idx + 1, TOTAL)
 
-# ===================== ĐIỀU HƯỚNG =====================
 st.markdown("<br>", unsafe_allow_html=True)
 
-nav1, nav2, nav3 = st.columns([1, 3, 1])
+# ===================== HÀNG NÚT ĐIỀU HƯỚNG =====================
+nav1, nav2, nav3, nav4 = st.columns([1, 2.5, 1, 1.5])
 
 with nav1:
     if st.button("◀ Trước", key="prev_btn", use_container_width=True):
@@ -817,6 +1070,26 @@ with nav3:
     if st.button("Tiếp ▶", key="next_btn", use_container_width=True):
         st.session_state.slide_idx = (st.session_state.slide_idx + 1) % TOTAL
         st.rerun()
+
+with nav4:
+    # Nút tải PPTX
+    if st.button("📥 Tải PPTX", key="dl_btn", use_container_width=True):
+        with st.spinner("Đang tạo file PPTX..."):
+            pptx_bytes = build_pptx()
+            if pptx_bytes:
+                st.session_state["pptx_data"] = pptx_bytes
+            else:
+                st.error("Cần cài `python-pptx`: thêm `python-pptx` vào requirements.txt")
+
+# Nút download (ẩn dưới dạng download_button để trình duyệt tải file)
+if "pptx_data" in st.session_state and st.session_state["pptx_data"]:
+    st.download_button(
+        label="⬇️ Nhấn để tải file PPTX",
+        data=st.session_state["pptx_data"],
+        file_name=f"DaoTao_PCCC_YangTrung_{datetime.now().strftime('%Y%m%d_%H%M')}.pptx",
+        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        use_container_width=True,
+    )
 
 # ===================== CHỌN SLIDE NHANH =====================
 with st.expander("🔍 Chuyển nhanh đến slide"):
