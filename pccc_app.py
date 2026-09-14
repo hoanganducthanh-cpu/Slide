@@ -33,37 +33,69 @@ def load_image(path):
     return None
 
 
-# ===================== CSS =====================
+# ===================== ẨN TOOLBAR STREAMLIT (đặt đầu tiên) =====================
+st.markdown("""
+<style>
+    /* Ẩn thanh toolbar, header, footer mặc định của Streamlit */
+    header[data-testid="stHeader"] {
+        display: none !important;
+        height: 0 !important;
+    }
+    #MainMenu { visibility: hidden !important; }
+    footer { visibility: hidden !important; }
+    [data-testid="stToolbar"] { display: none !important; }
+    [data-testid="stDecoration"] { display: none !important; }
+    [data-testid="stStatusWidget"] { display: none !important; }
+    [data-testid="stAppViewContainer"] > .main { padding-top: 0 !important; }
+    .stApp > header { display: none !important; }
+    section.main > div { padding-top: 0 !important; }
+</style>
+""", unsafe_allow_html=True)
+
+
+# ===================== CSS CHÍNH =====================
 st.markdown("""
 <style>
     .main { background: #ffffff; }
-    .block-container { padding: 0.5rem 1rem 2rem 1rem; max-width: 1400px; }
+    .block-container {
+        padding: 2.5rem 1.5rem 2rem 1.5rem !important;
+        max-width: 1400px;
+        margin-top: 0 !important;
+    }
 
-    /* ================= HEADER MỚI (nền trắng + viền đỏ, giống ảnh mẫu) ================= */
+    /* ================= HEADER MỚI (nền trắng + viền navy) ================= */
     .header-wrap {
         background: #ffffff;
         border-top: 4px solid #1a237e;
         border-bottom: 4px solid #1a237e;
-        padding: 12px 24px;
+        padding: 16px 24px;
         margin-bottom: 0;
+        margin-top: 6px;
         position: relative;
         box-shadow: 0 2px 6px rgba(0,0,0,.08);
+        min-height: 95px;
+        box-sizing: border-box;
+        font-size: 0;
     }
     .header-logo-box {
         display: inline-block;
         vertical-align: middle;
-        width: 130px;
+        width: 150px;
+        font-size: 14px;
     }
     .header-logo-box img {
-        height: 55px;
+        height: 62px;
         vertical-align: middle;
+        display: block;
     }
     .header-text-box {
         display: inline-block;
         vertical-align: middle;
         padding-left: 20px;
-        width: calc(100% - 200px);
+        width: calc(100% - 220px);
         text-align: center;
+        padding-top: 4px;
+        font-size: 14px;
     }
     .header-text-box .company {
         font-size: 22px;
@@ -77,7 +109,7 @@ st.markdown("""
         font-weight: 700;
         color: #CC0000;
         letter-spacing: .5px;
-        margin-top: 4px;
+        margin-top: 6px;
     }
     .header-slide-no {
         display: inline-block;
@@ -87,19 +119,20 @@ st.markdown("""
         font-size: 12px;
         font-weight: 600;
         color: #999;
+        font-size: 12px;
     }
 
     /* ================= TIÊU ĐỀ SLIDE (nền đỏ, chữ trắng) ================= */
     .slide-title-bar {
         background: linear-gradient(135deg, #cc0000, #990000);
         color: #ffffff;
-        padding: 12px 22px;
+        padding: 14px 24px;
         font-size: 17px;
         font-weight: 700;
-        margin: 14px 0 16px 0;
+        margin: 16px 0 18px 0;
         border-radius: 6px;
         letter-spacing: .3px;
-        box-shadow: 0 3px 8px rgba(204,0,0,.2);
+        box-shadow: 0 3px 8px rgba(204,0,0,.25);
     }
 
     /* ================= COVER ================= */
@@ -108,6 +141,7 @@ st.markdown("""
         overflow: hidden;
         min-height: 620px;
         box-shadow: 0 10px 40px rgba(0,0,0,.3);
+        font-size: 0;
     }
     .cover-left {
         display: inline-block;
@@ -119,6 +153,7 @@ st.markdown("""
         box-sizing: border-box;
         min-height: 620px;
         position: relative;
+        font-size: 14px;
     }
     .cover-left .logo {
         position: absolute;
@@ -182,6 +217,7 @@ st.markdown("""
         background-repeat: no-repeat;
         box-sizing: border-box;
         position: relative;
+        font-size: 14px;
     }
     .cover-right::after {
         content: '';
@@ -582,9 +618,8 @@ SLIDES = [
 ]
 
 
-# ===================== RENDER HEADER (giống ảnh mẫu) =====================
+# ===================== RENDER HEADER =====================
 def render_header(idx, total):
-    """Header giống ảnh mẫu: nền trắng + viền xanh navy + logo PESE + tên công ty."""
     logo_b64 = img_to_base64(LOGO_PATH)
     logo_html = f'<img src="data:image/png;base64,{logo_b64}" alt="PESE">' if logo_b64 else ''
     st.markdown(f"""
@@ -598,7 +633,6 @@ def render_header(idx, total):
 
 
 def render_title_bar(title):
-    """Tiêu đề slide: nền đỏ, chữ trắng."""
     st.markdown(f'<div class="slide-title-bar">📑 {title}</div>', unsafe_allow_html=True)
 
 
